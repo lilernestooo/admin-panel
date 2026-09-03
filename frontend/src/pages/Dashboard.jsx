@@ -70,48 +70,57 @@ export default function Dashboard() {
     }
   }
 
-  const columns = [
+const columns = [
   // ── Identity ──────────────────────────────
   {
     title: 'User',
     dataIndex: 'user_name',
     key: 'user_name',
     fixed: 'left',
-    width: 200,
+    width: 220, // Increased from 180 to give the avatar and name breathing room
+    align: 'left', // Keeping identity left-aligned is standard practice for clean alignment with avatars
     render: (text, record) => (
-      <Space>
+      <Space style={{ paddingLeft: '8px' }}>
         <Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />
         <div>
-          <div style={{ fontWeight: 600 }}>{text}</div>
-          <Text type="secondary" style={{ fontSize: 12 }}>{record.userid}</Text>
+          <div style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{text}</div>
+          <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>{record.userid}</Text>
         </div>
       </Space>
     ),
   },
-  { title: 'Rec ID', dataIndex: 'rec_id', key: 'rec_id', width: 80 },
-  { title: 'Employee ID', dataIndex: 'user_employee_id', key: 'user_employee_id', width: 120 },
+  { title: 'Rec ID', dataIndex: 'rec_id', key: 'rec_id', width: 100, align: 'center' },
+  { title: 'Employee ID', dataIndex: 'user_employee_id', key: 'user_employee_id', width: 150, align: 'center' },
 
   // ── Contact ───────────────────────────────
-  { title: 'Email', dataIndex: 'user_email_address', key: 'user_email_address', width: 200 },
-  { title: 'Mobile', dataIndex: 'user_mobile_no', key: 'user_mobile_no', width: 140 },
-  { title: 'TG Mobile No', dataIndex: 'tg_mobile_no', key: 'tg_mobile_no', width: 140 },
-  { title: 'Extension ID', dataIndex: 'extn_id', key: 'extn_id', width: 150 },
-  { title: 'Extn Dial Prefix', dataIndex: 'extn_dial_prefix', key: 'extn_dial_prefix', width: 150 },
+  { 
+    title: 'Email', 
+    dataIndex: 'user_email_address', 
+    key: 'user_email_address', 
+    width: 240, // Increased significantly from 150 to stop emails from wrapping into two lines
+    align: 'center',
+    ellipsis: true // Automatically adds '...' if an exceptionally long email hits the border boundary
+  },
+  { title: 'Mobile', dataIndex: 'user_mobile_no', key: 'user_mobile_no', width: 150, align: 'center' },
+  { title: 'TG Mobile No', dataIndex: 'tg_mobile_no', key: 'tg_mobile_no', width: 160, align: 'center' },
+  { title: 'Extension ID', dataIndex: 'extn_id', key: 'extn_id', width: 150, align: 'center' },
+  { title: 'Extn Dial Prefix', dataIndex: 'extn_dial_prefix', key: 'extn_dial_prefix', width: 150, align: 'center' },
 
   // ── Company / Organization ────────────────
-  { title: 'Company', dataIndex: 'companyid', key: 'companyid', width: 180 },
-  { title: 'Dealer Group Code', dataIndex: 'user_dealer_group_code', key: 'user_dealer_group_code', width: 150 },
-  { title: 'Function', dataIndex: 'chFunction', key: 'chFunction', width: 150 },
-  { title: 'Calendar Folder', dataIndex: 'calendar_folder', key: 'calendar_folder', width: 150 },
+  { title: 'Company', dataIndex: 'companyid', key: 'companyid', width: 160, align: 'center' },
+  { title: 'Dealer Group Code', dataIndex: 'user_dealer_group_code', key: 'user_dealer_group_code', width: 160, align: 'center' },
+  { title: 'Function', dataIndex: 'chFunction', key: 'chFunction', width: 150, align: 'center' },
+  { title: 'Calendar Folder', dataIndex: 'calendar_folder', key: 'calendar_folder', width: 160, align: 'center' },
 
   // ── Access & Security ─────────────────────
   {
     title: 'Rights',
     dataIndex: 'user_rights',
     key: 'user_rights',
-    width: 110,
+    width: 120,
+    align: 'center',
     render: (rights) => (
-      <Tag color={rights === 'admin' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0 }}>
+      <Tag color={rights === 'admin' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0, margin: 0 }}>
         {(rights || 'user').toUpperCase()}
       </Tag>
     ),
@@ -120,22 +129,25 @@ export default function Dashboard() {
     title: 'Force Change PW',
     dataIndex: 'chg_password',
     key: 'chg_password',
-    width: 140,
-    render: (val) => <Tag style={{ borderRadius: 0 }}>{val === 'Y' ? 'Yes' : 'No'}</Tag>,
+    width: 150,
+    align: 'center',
+    render: (val) => <Tag style={{ borderRadius: 0, margin: 0 }}>{val === 'Y' ? 'Yes' : 'No'}</Tag>,
   },
   {
     title: 'PW Changed At',
     dataIndex: 'chg_psswrd_datetime',
     key: 'chg_psswrd_datetime',
-    width: 170,
+    width: 180,
+    align: 'center',
     render: (val) => val ? new Date(val).toLocaleString() : <Text type="secondary">—</Text>,
   },
-  { title: 'OTP Code', dataIndex: 'otp_code', key: 'otp_code', width: 100 },
+  { title: 'OTP Code', dataIndex: 'otp_code', key: 'otp_code', width: 120, align: 'center' },
   {
     title: 'OTP Expires At',
     dataIndex: 'otp_expires_at',
     key: 'otp_expires_at',
-    width: 170,
+    width: 180,
+    align: 'center',
     render: (val) => val ? new Date(val).toLocaleString() : <Text type="secondary">—</Text>,
   },
 
@@ -144,21 +156,24 @@ export default function Dashboard() {
     title: 'Last Login',
     dataIndex: 'last_loggin',
     key: 'last_loggin',
-    width: 170,
+    width: 180,
+    align: 'center',
     render: (val) => val ? new Date(val).toLocaleString() : <Text type="secondary">Never</Text>,
   },
   {
     title: 'Created At',
     dataIndex: 'created_at',
     key: 'created_at',
-    width: 170,
+    width: 180,
+    align: 'center',
     render: (val) => val ? new Date(val).toLocaleString() : '—',
   },
   {
     title: 'Updated At',
     dataIndex: 'updated_at',
     key: 'updated_at',
-    width: 170,
+    width: 180,
+    align: 'center',
     render: (val) => val ? new Date(val).toLocaleString() : '—',
   },
 
@@ -168,8 +183,9 @@ export default function Dashboard() {
     key: 'actions',
     fixed: 'right',
     width: 180,
+    align: 'center',
     render: (_, record) => (
-      <Space>
+      <Space size="middle">
         <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(record)}>Edit</Button>
         <Popconfirm
           title="Delete this user?"
@@ -184,6 +200,7 @@ export default function Dashboard() {
     ),
   },
 ]
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
@@ -251,8 +268,8 @@ export default function Dashboard() {
             columns={columns}
             dataSource={users}
             loading={loading}
-            pagination={{ pageSize: 8 }}
-            scroll={{ x: 2600 }}
+            pagination={{ pageSize: 10 }}
+            scroll={{ x: 3500 }}
             />
           </div>
         </Content>
