@@ -1,0 +1,311 @@
+import React, { useEffect, useState } from 'react'
+import {
+  Layout, Table, Button, Modal, Form, Input, Select,
+  Tag, Avatar, Popconfirm, message, Statistic, Row, Col, Typography, Space
+} from 'antd'
+import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import Sidebar from '../components/Sidebar'
+import Navbar from '../components/Navbar'
+import { fetchUsers, registerUser, updateUser, deleteUser } from '../api/userApi'
+
+const { Content } = Layout
+const { Text } = Typography
+
+export default function Dashboard() {
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+  const [form] = Form.useForm()
+
+  const loadUsers = async () => {
+    setLoading(true)
+    try {
+      const res = await fetchUsers()
+      if (res.success) setUsers(res.data)
+      else message.error(res.message || 'Failed to load users')
+    } catch (err) {
+      message.error('Could not reach the backend. Is XAMPP running?')
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => { loadUsers() }, [])
+
+  const openAddModal = () => {
+    setEditingUser(null)
+    form.resetFields()
+    setModalOpen(true)
+  }
+
+  const openEditModal = (record) => {
+    setEditingUser(record)
+    form.setFieldsValue(record)
+    setModalOpen(true)
+  }
+
+  const handleDelete = async (rec_id) => {
+    const res = await deleteUser(rec_id)
+    if (res.success) {
+      message.success('User deleted')
+      loadUsers()
+    } else {
+      message.error(res.message || 'Delete failed')
+    }
+  }
+
+  const handleSubmit = async (values) => {
+    let res
+    if (editingUser) {
+      res = await updateUser({ ...values, rec_id: editingUser.rec_id })
+    } else {
+      res = await registerUser(values)
+    }
+    if (res.success) {
+      message.success(editingUser ? 'User updated' : 'User registered')
+      setModalOpen(false)
+      loadUsers()
+    } else {
+      message.error(res.message || 'Something went wrong')
+    }
+  }
+
+  const columns = [
+  {
+    title: 'User',
+    dataIndex: 'user_name',
+    key: 'user_name',
+    fixed: 'left',
+    width: 200,
+    render: (text, record) => (
+      <Space>
+        <Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />
+        <div>
+          <div style={{ fontWeight: 600 }}>{text}</div>
+          <Text type="secondary" style={{ fontSize: 12 }}>{record.userid}</Text>
+        </div>
+      </Space>
+    ),
+  },
+  { title: 'Rec ID', dataIndex: 'rec_id', key: 'rec_id', width: 80 },
+  { title: 'Employee ID', dataIndex: 'user_employee_id', key: 'user_employee_id', width: 120 },
+  { title: 'Company', dataIndex: 'companyid', key: 'companyid', width: 180 },
+  { title: 'Dealer Group Code', dataIndex: 'user_dealer_group_code', key: 'user_dealer_group_code', width: 150 },
+  { title: 'Calendar Folder', dataIndex: 'calendar_folder', key: 'calendar_folder', width: 150 },
+  {
+    title: 'Force Change PW',
+    dataIndex: 'chg_password',
+    key: 'chg_password',
+    width: 140,
+    render: (val) => <Tag style={{ borderRadius: 0 }}>{val === 'Y' ? 'Yes' : 'No'}</Tag>,
+  },
+  {
+    title: 'PW Changed At',
+    dataIndex: 'chg_psswrd_datetime',
+    key: 'chg_psswrd_datetime',
+    width: 170,
+    render: (val) => val ? new Date(val).toLocaleString() : <Text type="secondary">—</Text>,
+  },
+  { title: 'Email', dataIndex: 'user_email_address', key: 'user_email_address', width: 200 },
+  { title: 'Mobile', dataIndex: 'user_mobile_no', key: 'user_mobile_no', width: 140 },
+  { title: 'Function', dataIndex: 'chFunction', key: 'chFunction', width: 150 },
+  { title: 'Extension ID', dataIndex: 'extn_id', key: 'extn_id', width: 150 },
+  { title: 'Extn Dial Prefix', dataIndex: 'extn_dial_prefix', key: 'extn_dial_prefix', width: 150 },
+  { title: 'TG Mobile No', dataIndex: 'tg_mobile_no', key: 'tg_mobile_no', width: 140 },
+  { title: 'OTP Code', dataIndex: 'otp_code', key: 'otp_code', width: 100 },
+  {
+    title: 'OTP Expires At',
+    dataIndex: 'otp_expires_at',
+    key: 'otp_expires_at',
+    width: 170,
+    render: (val) => val ? new Date(val).toLocaleString() : <Text type="secondary">—</Text>,
+  },
+  {
+    title: 'Rights',
+    dataIndex: 'user_rights',
+    key: 'user_rights',
+    width: 110,
+    render: (rights) => (
+      <Tag color={rights === 'admin' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0 }}>
+        {(rights || 'user').toUpperCase()}
+      </Tag>
+    ),
+  },
+  {
+    title: 'Last Login',
+    dataIndex: 'last_loggin',
+    key: 'last_loggin',
+    width: 170,
+    render: (val) => val ? new Date(val).toLocaleString() : <Text type="secondary">Never</Text>,
+  },
+  {
+    title: 'Created At',
+    dataIndex: 'created_at',
+    key: 'created_at',
+    width: 170,
+    render: (val) => val ? new Date(val).toLocaleString() : '—',
+  },
+  {
+    title: 'Updated At',
+    dataIndex: 'updated_at',
+    key: 'updated_at',
+    width: 170,
+    render: (val) => val ? new Date(val).toLocaleString() : '—',
+  },
+  {
+    title: 'Actions',
+    key: 'actions',
+    fixed: 'right',
+    width: 180,
+    render: (_, record) => (
+      <Space>
+        <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(record)}>Edit</Button>
+        <Popconfirm
+          title="Delete this user?"
+          description="This action cannot be undone."
+          onConfirm={() => handleDelete(record.rec_id)}
+          okText="Delete"
+          okButtonProps={{ danger: true }}
+        >
+          <Button size="small" danger icon={<DeleteOutlined />}>Delete</Button>
+        </Popconfirm>
+      </Space>
+    ),
+  },
+]
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sidebar />
+      <Layout>
+        <Navbar title="User Registration" />
+        <Content style={{ margin: 24 }}>
+          <Row justify="end" style={{ marginBottom: 16 }}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal} style={{ background: '#111', borderColor: '#111' }}>
+              Add User
+            </Button>
+          </Row>
+
+          <Row gutter={16} style={{ marginBottom: 24 }}>
+            <Col span={8}>
+              <div style={{ background: '#fff', border: '1px solid #f0f0f0', padding: 20 }}>
+                <Statistic title="Total Users" value={users.length} valueStyle={{ color: '#0a0a0a' }} />
+              </div>
+            </Col>
+            <Col span={8}>
+              <div style={{ background: '#fff', border: '1px solid #f0f0f0', padding: 20 }}>
+                <Statistic
+                  title="Admins"
+                  value={users.filter(u => u.user_rights === 'admin').length}
+                  valueStyle={{ color: '#0a0a0a' }}
+                />
+              </div>
+            </Col>
+            <Col span={8}>
+              <div style={{ background: '#fff', border: '1px solid #f0f0f0', padding: 20 }}>
+                <Statistic
+                  title="Regular Users"
+                  value={users.filter(u => u.user_rights !== 'admin').length}
+                  valueStyle={{ color: '#0a0a0a' }}
+                />
+              </div>
+            </Col>
+          </Row>
+
+          <div style={{ background: '#fff', border: '1px solid #f0f0f0' }}>
+            <Table
+            rowKey="rec_id"
+            columns={columns}
+            dataSource={users}
+            loading={loading}
+            pagination={{ pageSize: 8 }}
+            scroll={{ x: 2600 }}
+            />
+          </div>
+        </Content>
+      </Layout>
+
+        <Modal
+        title={editingUser ? 'Edit User' : 'Register New User'}
+        open={modalOpen}
+        onCancel={() => setModalOpen(false)}
+        footer={null}
+        destroyOnClose
+        width={760}
+        styles={{ body: { maxHeight: '70vh', overflowY: 'auto', paddingRight: 8 } }}
+        >
+     <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        {(() => {
+            const fields = [
+            <Form.Item key="userid" name="userid" label="User ID" rules={[{ required: true, message: 'User ID is required' }]}>
+                <Input disabled={!!editingUser} placeholder="e.g. jdoe" />
+            </Form.Item>,
+            <Form.Item key="rights" name="user_rights" label="Access Rights" initialValue="user">
+                <Select
+                options={[
+                    { value: 'admin', label: 'Admin' },
+                    { value: 'user', label: 'User' },
+                ]}
+                />
+            </Form.Item>,
+            <Form.Item key="name" name="user_name" label="Full Name" rules={[{ required: true, message: 'Name is required' }]}>
+                <Input placeholder="Juan Dela Cruz" />
+            </Form.Item>,
+            <Form.Item key="empid" name="user_employee_id" label="Employee ID">
+                <Input maxLength={6} placeholder="EMP001" />
+            </Form.Item>,
+            ...(!editingUser ? [
+                <Form.Item key="password" name="user_password" label="Password" rules={[{ required: true, min: 6, message: 'At least 6 characters' }]}>
+                <Input.Password placeholder="Set a password" />
+                </Form.Item>
+            ] : []),
+            <Form.Item key="company" name="companyid" label="Company">
+                <Input placeholder="Company name or ID" />
+            </Form.Item>,
+            <Form.Item key="email" name="user_email_address" label="Email" rules={[{ type: 'email', message: 'Enter a valid email' }]}>
+                <Input placeholder="user@example.com" />
+            </Form.Item>,
+            <Form.Item key="mobile" name="user_mobile_no" label="Mobile Number">
+                <Input placeholder="09171234567" />
+            </Form.Item>,
+            <Form.Item key="calendar" name="calendar_folder" label="Calendar Folder">
+                <Input placeholder="e.g. default_calendar" />
+            </Form.Item>,
+            <Form.Item key="function" name="chFunction" label="Function">
+                <Input placeholder="e.g. System Administrator" />
+            </Form.Item>,
+            <Form.Item key="extnid" name="extn_id" label="Extension ID">
+                <Input placeholder="Extension ID" />
+            </Form.Item>,
+            <Form.Item key="extndial" name="extn_dial_prefix" label="Extension Dial Prefix">
+                <Input placeholder="Dial prefix" />
+            </Form.Item>,
+            <Form.Item key="tgmobile" name="tg_mobile_no" label="TG Mobile No">
+                <Input placeholder="Alternate mobile number" />
+            </Form.Item>,
+            ]
+
+            const rows = []
+            for (let i = 0; i < fields.length; i += 2) {
+            rows.push(
+                <Row gutter={16} key={`row-${i}`}>
+                <Col span={12}>{fields[i]}</Col>
+                {fields[i + 1] && <Col span={12}>{fields[i + 1]}</Col>}
+                </Row>
+            )
+            }
+            return rows
+        })()}
+
+        <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
+            <Space>
+            <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button type="primary" htmlType="submit" style={{ background: '#111', borderColor: '#111' }}>
+                {editingUser ? 'Save Changes' : 'Register'}
+            </Button>
+            </Space>
+        </Form.Item>
+        </Form>
+        </Modal>
+    </Layout>
+  )
+}
