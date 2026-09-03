@@ -27,8 +27,8 @@ const bwTheme = {
       defaultColor: '#111111',
     },
     Table: {
-      headerBg: '#0a0a0a',
-      headerColor: '#ffffff',
+      headerBg: '#534f4f',
+      headerColor: '#0a0a0a',
       rowHoverBg: '#f5f5f5',
     },
   },

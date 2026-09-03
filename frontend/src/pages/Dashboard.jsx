@@ -71,6 +71,7 @@ export default function Dashboard() {
   }
 
   const columns = [
+  // ── Identity ──────────────────────────────
   {
     title: 'User',
     dataIndex: 'user_name',
@@ -89,9 +90,32 @@ export default function Dashboard() {
   },
   { title: 'Rec ID', dataIndex: 'rec_id', key: 'rec_id', width: 80 },
   { title: 'Employee ID', dataIndex: 'user_employee_id', key: 'user_employee_id', width: 120 },
+
+  // ── Contact ───────────────────────────────
+  { title: 'Email', dataIndex: 'user_email_address', key: 'user_email_address', width: 200 },
+  { title: 'Mobile', dataIndex: 'user_mobile_no', key: 'user_mobile_no', width: 140 },
+  { title: 'TG Mobile No', dataIndex: 'tg_mobile_no', key: 'tg_mobile_no', width: 140 },
+  { title: 'Extension ID', dataIndex: 'extn_id', key: 'extn_id', width: 150 },
+  { title: 'Extn Dial Prefix', dataIndex: 'extn_dial_prefix', key: 'extn_dial_prefix', width: 150 },
+
+  // ── Company / Organization ────────────────
   { title: 'Company', dataIndex: 'companyid', key: 'companyid', width: 180 },
   { title: 'Dealer Group Code', dataIndex: 'user_dealer_group_code', key: 'user_dealer_group_code', width: 150 },
+  { title: 'Function', dataIndex: 'chFunction', key: 'chFunction', width: 150 },
   { title: 'Calendar Folder', dataIndex: 'calendar_folder', key: 'calendar_folder', width: 150 },
+
+  // ── Access & Security ─────────────────────
+  {
+    title: 'Rights',
+    dataIndex: 'user_rights',
+    key: 'user_rights',
+    width: 110,
+    render: (rights) => (
+      <Tag color={rights === 'admin' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0 }}>
+        {(rights || 'user').toUpperCase()}
+      </Tag>
+    ),
+  },
   {
     title: 'Force Change PW',
     dataIndex: 'chg_password',
@@ -106,12 +130,6 @@ export default function Dashboard() {
     width: 170,
     render: (val) => val ? new Date(val).toLocaleString() : <Text type="secondary">—</Text>,
   },
-  { title: 'Email', dataIndex: 'user_email_address', key: 'user_email_address', width: 200 },
-  { title: 'Mobile', dataIndex: 'user_mobile_no', key: 'user_mobile_no', width: 140 },
-  { title: 'Function', dataIndex: 'chFunction', key: 'chFunction', width: 150 },
-  { title: 'Extension ID', dataIndex: 'extn_id', key: 'extn_id', width: 150 },
-  { title: 'Extn Dial Prefix', dataIndex: 'extn_dial_prefix', key: 'extn_dial_prefix', width: 150 },
-  { title: 'TG Mobile No', dataIndex: 'tg_mobile_no', key: 'tg_mobile_no', width: 140 },
   { title: 'OTP Code', dataIndex: 'otp_code', key: 'otp_code', width: 100 },
   {
     title: 'OTP Expires At',
@@ -120,17 +138,8 @@ export default function Dashboard() {
     width: 170,
     render: (val) => val ? new Date(val).toLocaleString() : <Text type="secondary">—</Text>,
   },
-  {
-    title: 'Rights',
-    dataIndex: 'user_rights',
-    key: 'user_rights',
-    width: 110,
-    render: (rights) => (
-      <Tag color={rights === 'admin' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0 }}>
-        {(rights || 'user').toUpperCase()}
-      </Tag>
-    ),
-  },
+
+  // ── Activity / Timestamps ─────────────────
   {
     title: 'Last Login',
     dataIndex: 'last_loggin',
@@ -152,6 +161,8 @@ export default function Dashboard() {
     width: 170,
     render: (val) => val ? new Date(val).toLocaleString() : '—',
   },
+
+  // ── Actions ────────────────────────────────
   {
     title: 'Actions',
     key: 'actions',
@@ -185,31 +196,54 @@ export default function Dashboard() {
             </Button>
           </Row>
 
-          <Row gutter={16} style={{ marginBottom: 24 }}>
+       <Row gutter={16} style={{ marginBottom: 24 }}>
             <Col span={8}>
-              <div style={{ background: '#fff', border: '1px solid #f0f0f0', padding: 20 }}>
-                <Statistic title="Total Users" value={users.length} valueStyle={{ color: '#0a0a0a' }} />
-              </div>
-            </Col>
-            <Col span={8}>
-              <div style={{ background: '#fff', border: '1px solid #f0f0f0', padding: 20 }}>
-                <Statistic
-                  title="Admins"
-                  value={users.filter(u => u.user_rights === 'admin').length}
-                  valueStyle={{ color: '#0a0a0a' }}
+                <div style={{ 
+                background: '#fff', 
+                border: '1px solid #e8e8e8', 
+                padding: '24px 20px', 
+                borderRadius: '8px', 
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' 
+                }}>
+                <Statistic 
+                    title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Total Users</span>} 
+                    value={users.length} 
+                    valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }} 
                 />
-              </div>
+                </div>
             </Col>
             <Col span={8}>
-              <div style={{ background: '#fff', border: '1px solid #f0f0f0', padding: 20 }}>
+                <div style={{ 
+                background: '#fff', 
+                border: '1px solid #e8e8e8', 
+                padding: '24px 20px', 
+                borderRadius: '8px', 
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' 
+                }}>
                 <Statistic
-                  title="Regular Users"
-                  value={users.filter(u => u.user_rights !== 'admin').length}
-                  valueStyle={{ color: '#0a0a0a' }}
+                    title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Admins</span>}
+                    value={users.filter(u => u.user_rights === 'admin').length}
+                    valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }}
                 />
-              </div>
+                </div>
             </Col>
-          </Row>
+            <Col span={8}>
+                <div style={{ 
+                background: '#fff', 
+                border: '1px solid #e8e8e8', 
+                padding: '24px 20px', 
+                borderRadius: '8px', 
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' 
+                }}>
+                <Statistic
+                    title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Regular Users</span>}
+                    value={users.filter(u => u.user_rights !== 'admin').length}
+                    valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }}
+                />
+                </div>
+            </Col>
+            </Row>
+
 
           <div style={{ background: '#fff', border: '1px solid #f0f0f0' }}>
             <Table

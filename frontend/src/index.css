@@ -13,6 +13,14 @@ body {
 .ant-table-thead > tr > th {
   font-weight: 600;
   letter-spacing: 0.3px;
+  text-transform: uppercase;
+  background: #7c7878 !important;
+  color: #0a0a0a !important;
+  text-align: center !important;
+}
+
+.ant-table-tbody > tr > td {
+  text-transform: uppercase;
 }
 
 .ant-menu-dark .ant-menu-item-selected {
