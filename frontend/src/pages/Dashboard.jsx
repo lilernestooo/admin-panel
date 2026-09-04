@@ -339,9 +339,11 @@ const columns = [
         footer={null}
         destroyOnClose
         width={760}
+        maskClosable={false}
+        keyboard={false}
         styles={{ body: { maxHeight: '70vh', overflowY: 'auto', paddingRight: 8 } }}
         >
-     <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
         {(() => {
             const fields = [
             <Form.Item key="userid" name="userid" label="User ID" rules={[{ required: true, message: 'User ID is required' }]}>
@@ -430,26 +432,26 @@ const columns = [
         })()}
 
         <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
-            <Space>
-            <Button onClick={() => setModalOpen(false)}>Cancel</Button>
             <Button type="primary" htmlType="submit" style={{ background: '#111', borderColor: '#111' }}>
                 {editingUser ? 'Submit' : 'Submit'}
             </Button>
-            </Space>
         </Form.Item>
+
         </Form>
         </Modal>
 
-        <Modal
-          title="Confirm Your Password"
-          open={verifyModalOpen}
-          onCancel={() => {
-            setVerifyModalOpen(false)
-            verifyForm.resetFields()
-          }}
-          footer={null}
-          destroyOnClose
-        >
+          <Modal
+            title="Confirm Your Password"
+            open={verifyModalOpen}
+            onCancel={() => {
+              setVerifyModalOpen(false)
+              verifyForm.resetFields()
+            }}
+            footer={null}
+            destroyOnClose
+            maskClosable={false}
+            keyboard={false}
+          >
           <p style={{ color: '#595959', marginBottom: 16 }}>
             For security, enter your own account password to unlock the New Password field.
           </p>
@@ -461,13 +463,10 @@ const columns = [
             >
               <Input.Password placeholder="Enter your password" autoFocus />
             </Form.Item>
-            <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-              <Space>
-                <Button onClick={() => { setVerifyModalOpen(false); verifyForm.resetFields() }}>Cancel</Button>
-                <Button type="primary" htmlType="submit" loading={verifying} style={{ background: '#111', borderColor: '#111' }}>
-                  Verify
+              <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+                     <Button type="primary" htmlType="submit" loading={verifying} style={{ background: '#111', borderColor: '#111' }}>
+                     Verify
                 </Button>
-              </Space>
             </Form.Item>
           </Form>
         </Modal>
