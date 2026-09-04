@@ -6,6 +6,7 @@ import {
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
+import UserSearchBar from '../components/UserSearchBar'
 import { fetchUsers, registerUser, updateUser, deleteUser } from '../api/userApi'
 
 const { Content } = Layout
@@ -16,7 +17,18 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
   const [form] = Form.useForm()
+
+  const filteredUsers = users.filter((u) => {
+    const term = searchTerm.toLowerCase()
+    return (
+      u.user_name?.toLowerCase().includes(term) ||
+      u.userid?.toLowerCase().includes(term) ||
+      u.user_email_address?.toLowerCase().includes(term) ||
+      u.companyid?.toLowerCase().includes(term)
+    )
+  })
 
   const loadUsers = async () => {
     setLoading(true)
@@ -259,22 +271,23 @@ const columns = [
             </Col>
             </Row>
 
-            <Row justify="end" style={{ marginBottom: 16 }}>
+          <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
+              <UserSearchBar onSearch={setSearchTerm} />
               <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal} style={{ background: '#111', borderColor: '#111' }}>
                 Add User
               </Button>
             </Row>
 
             <div style={{ background: '#fff', border: '1px solid #f0f0f0' }}>
-            <Table
-            rowKey="rec_id"
-            columns={columns}
-            dataSource={users}
-            loading={loading}
-            pagination={{ pageSize: 10 }}
-            scroll={{ x: 3500 }}
-            />
-          </div>
+              <Table
+                rowKey="rec_id"
+                columns={columns}
+                dataSource={filteredUsers}
+                loading={loading}
+                pagination={{ pageSize: 10 }}
+                scroll={{ x: 3500 }}
+              />
+            </div>
         </Content>
       </Layout>
 

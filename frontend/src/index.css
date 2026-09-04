@@ -43,3 +43,10 @@ body {
 .ant-menu-dark .ant-menu-item-selected .anticon {
   color: #000000 !important;
 }
+
+/* Darker default border for the search bar, no hover/focus override
+   so Ant Design's native hover and focus states still apply normally */
+.user-search-bar .ant-input-affix-wrapper,
+.user-search-bar.ant-input-affix-wrapper {
+  border-color: #777171;
+}
