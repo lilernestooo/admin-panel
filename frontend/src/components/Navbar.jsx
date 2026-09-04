@@ -16,7 +16,7 @@ export default function Navbar({ title }) {
   }
 
   const menuItems = [
-    { key: 'logout', label: 'Log out', icon: <LogoutOutlined />, onClick: handleLogout },
+    { key: 'logout', label: 'Log out', icon: <LogoutOutlined />, onClick: handleLogout, danger: true },
   ]
 
   return (

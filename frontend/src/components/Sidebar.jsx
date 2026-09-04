@@ -39,8 +39,7 @@ export default function Sidebar() {
             <Text style={{ color: '#8c8c8c', fontSize: 12 }}>User Management</Text>
           </div>
         )}
-
-        <div
+       <div
           onClick={() => setCollapsed(!collapsed)}
           style={{
             color: '#8c8c8c',
