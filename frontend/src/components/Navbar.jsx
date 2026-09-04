@@ -22,24 +22,24 @@ export default function Navbar({ title }) {
   return (
     <Header
       style={{
-        background: '#fff',
-        borderBottom: '1px solid #f0f0f0',
+        background: '#0a0a0a',
+        borderBottom: '1px solid #262626',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 24px',
       }}
     >
-      <Title level={4} style={{ margin: 0 }}>{title}</Title>
+      <Title level={4} style={{ margin: 0, color: '#fff' }}>{title}</Title>
 
       <Dropdown menu={{ items: menuItems }} trigger={['click']}>
         <Space style={{ cursor: 'pointer' }}>
-          <Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />
+          <Avatar style={{ backgroundColor: '#fff', color: '#0a0a0a' }} icon={<UserOutlined />} />
           <div style={{ lineHeight: 1.2 }}>
-            <div style={{ fontWeight: 600, fontSize: 13 }}>{storedUser.user_name || 'Admin'}</div>
-            <Text type="secondary" style={{ fontSize: 11 }}>{storedUser.user_rights || 'admin'}</Text>
+            <div style={{ fontWeight: 600, fontSize: 13, color: '#fff' }}>{storedUser.user_name || 'Admin'}</div>
+            <Text style={{ fontSize: 11, color: '#8c8c8c' }}>{storedUser.user_rights || 'admin'}</Text>
           </div>
-          <DownOutlined style={{ fontSize: 10, color: '#8c8c8c' }} />
+          <DownOutlined style={{ fontSize: 10, color: '#fff' }} />
         </Space>
       </Dropdown>
     </Header>

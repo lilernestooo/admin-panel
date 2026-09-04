@@ -319,7 +319,7 @@ const columns = [
               </Button>
             </Row>
 
-            <div style={{ background: '#fff', border: '1px solid #f0f0f0' }}>
+           <div style={{ background: '#fff', border: '1px solid #f0f0f0' }}>
               <Table
                 rowKey="rec_id"
                 columns={columns}
@@ -327,9 +327,25 @@ const columns = [
                 loading={loading}
                 pagination={{ pageSize: 10 }}
                 scroll={{ x: 3500 }}
+                bordered
+                className="lgc-table"
               />
             </div>
         </Content>
+          <style>{`
+            .lgc-table .ant-table-thead > tr > th,
+            .lgc-table .ant-table-tbody > tr > td {
+              border-right: 1px solid #d9d9d9 !important;
+              border-bottom: 1px solid #d9d9d9 !important;
+            }
+            .lgc-table .ant-table-container {
+              border-left: 1px solid #d9d9d9 !important;
+              border-top: 1px solid #d9d9d9 !important;
+            }
+            .lgc-table .ant-table-tbody > tr:last-child > td {
+              border-bottom: 1px solid #d9d9d9 !important;
+            }
+          `}</style>
       </Layout>
 
         <Modal
