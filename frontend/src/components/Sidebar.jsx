@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { Layout, Menu, Typography } from 'antd'
 import {
-  DashboardOutlined, TeamOutlined, SettingOutlined,
+  TeamOutlined, SettingOutlined,
   MenuFoldOutlined, MenuUnfoldOutlined
 } from '@ant-design/icons'
+import DashboardIcon from '@mui/icons-material/Dashboard'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 const { Sider } = Layout
@@ -39,7 +40,7 @@ export default function Sidebar() {
             <Text style={{ color: '#8c8c8c', fontSize: 12 }}>User Management</Text>
           </div>
         )}
-       <div
+        <div
           onClick={() => setCollapsed(!collapsed)}
           style={{
             color: '#8c8c8c',
@@ -59,7 +60,7 @@ export default function Sidebar() {
         selectedKeys={[selectedKey]}
         style={{ background: '#0a0a0a', borderRight: 'none', marginTop: 12 }}
         items={[
-          { key: 'dashboard', icon: <DashboardOutlined />, label: 'Dashboard' },
+          { key: 'dashboard', icon: <DashboardIcon style={{ fontSize: 16 }} />, label: 'Dashboard' },
           { key: 'users', icon: <TeamOutlined />, label: 'Users' },
           { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
         ]}
