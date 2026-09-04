@@ -3,21 +3,27 @@ import {
   Layout, Table, Button, Modal, Form, Input, Select,
   Tag, Avatar, Popconfirm, message, Statistic, Row, Col, Typography, Space
 } from 'antd'
-import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons'
+import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
 import UserSearchBar from '../components/UserSearchBar'
-import { fetchUsers, registerUser, updateUser, deleteUser } from '../api/userApi'
+import { fetchUsers, registerUser, updateUser, deleteUser, verifyPassword } from '../api/userApi'
 
 const { Content } = Layout
 const { Text } = Typography
 
 export default function Dashboard() {
+  const navigate = useNavigate()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [passwordUnlocked, setPasswordUnlocked] = useState(false)
+  const [verifyModalOpen, setVerifyModalOpen] = useState(false)
+  const [verifying, setVerifying] = useState(false)
+  const [verifyForm] = Form.useForm()
   const [form] = Form.useForm()
 
   const filteredUsers = users.filter((u) => {
@@ -44,17 +50,35 @@ export default function Dashboard() {
 
   useEffect(() => { loadUsers() }, [])
 
-  const openAddModal = () => {
-    setEditingUser(null)
-    form.resetFields()
-    setModalOpen(true)
-  }
+const openAddModal = () => {
+  setEditingUser(null)
+  setPasswordUnlocked(false)
+  form.resetFields()
+  setModalOpen(true)
+}
 
-  const openEditModal = (record) => {
-    setEditingUser(record)
-    form.setFieldsValue(record)
-    setModalOpen(true)
+const openEditModal = (record) => {
+  setEditingUser(record)
+  setPasswordUnlocked(false)
+  form.setFieldsValue(record)
+  setModalOpen(true)
+}
+
+const handleVerifyPassword = async (values) => {
+  setVerifying(true)
+  const storedAdmin = JSON.parse(localStorage.getItem('admin_user') || '{}')
+  const res = await verifyPassword({ userid: storedAdmin.userid, password: values.confirm_password })
+  setVerifying(false)
+
+  if (res.success) {
+    setPasswordUnlocked(true)
+    setVerifyModalOpen(false)
+    verifyForm.resetFields()
+    message.success('Password field unlocked')
+  } else {
+    message.error(res.message || 'Incorrect password')
   }
+}
 
   const handleDelete = async (rec_id) => {
     const res = await deleteUser(rec_id)
@@ -66,21 +90,38 @@ export default function Dashboard() {
     }
   }
 
-  const handleSubmit = async (values) => {
-    let res
-    if (editingUser) {
-      res = await updateUser({ ...values, rec_id: editingUser.rec_id })
-    } else {
-      res = await registerUser(values)
-    }
-    if (res.success) {
-      message.success(editingUser ? 'User updated' : 'User registered')
-      setModalOpen(false)
-      loadUsers()
-    } else {
-      message.error(res.message || 'Something went wrong')
-    }
+const handleSubmit = async (values) => {
+  let res
+  if (editingUser) {
+    res = await updateUser({ ...values, rec_id: editingUser.rec_id })
+  } else {
+    res = await registerUser(values)
   }
+
+  if (res.success) {
+    setModalOpen(false)
+
+    if (editingUser && res.password_changed) {
+      Modal.success({
+        title: 'Password Changed Successfully',
+        content: 'The password has been updated. You will now be logged out — please log back in using the new password to confirm it works.',
+        okText: 'Log Out Now',
+        okButtonProps: { style: { background: '#111', borderColor: '#111' } },
+        onOk: () => {
+          localStorage.removeItem('admin_user')
+          navigate('/login')
+        },
+      })
+    }
+    
+    else {
+      message.success(editingUser ? 'User updated' : 'User registered')
+      loadUsers()
+    }
+  } else {
+    message.error(res.message || 'Something went wrong')
+  }
+}
 
 const columns = [
   // ── Identity ──────────────────────────────
@@ -320,11 +361,36 @@ const columns = [
             <Form.Item key="empid" name="user_employee_id" label="Employee ID">
                 <Input maxLength={6} placeholder="EMP001" />
             </Form.Item>,
-            ...(!editingUser ? [
-                <Form.Item key="password" name="user_password" label="Password" rules={[{ required: true, min: 6, message: 'At least 6 characters' }]}>
-                <Input.Password placeholder="Set a password" />
-                </Form.Item>
-            ] : []),
+              ...(!editingUser ? [
+                  <Form.Item key="password" name="user_password" label="Password" rules={[{ required: true, min: 6, message: 'At least 6 characters' }]}>
+                  <Input.Password placeholder="Set a password" />
+                  </Form.Item>
+              ] : [
+                  <Form.Item
+                      key="newpassword"
+                      name="new_password"
+                      label={
+                        <span>
+                          New Password{' '}
+                          <span
+                            onClick={() => {
+                              if (!passwordUnlocked) setVerifyModalOpen(true)
+                            }}
+                            style={{ cursor: passwordUnlocked ? 'default' : 'pointer', color: passwordUnlocked ? '#52c41a' : '#0a0a0a' }}
+                          >
+                            {passwordUnlocked ? <UnlockOutlined /> : <LockOutlined />}
+                          </span>
+                        </span>
+                      }
+                      rules={[{ min: 6, message: 'At least 6 characters' }]}
+                      extra={passwordUnlocked ? 'Leave blank to keep the current password' : 'Click the lock icon beside the label to enable editing'}
+                    >
+                      <Input.Password
+                        placeholder={passwordUnlocked ? 'Enter a new password to change it' : 'Locked — verify your password first'}
+                        disabled={!passwordUnlocked}
+                      />
+                    </Form.Item>
+              ]),
             <Form.Item key="company" name="companyid" label="Company">
                 <Input placeholder="Company name or ID" />
             </Form.Item>,
@@ -372,6 +438,38 @@ const columns = [
             </Space>
         </Form.Item>
         </Form>
+        </Modal>
+
+        <Modal
+          title="Confirm Your Password"
+          open={verifyModalOpen}
+          onCancel={() => {
+            setVerifyModalOpen(false)
+            verifyForm.resetFields()
+          }}
+          footer={null}
+          destroyOnClose
+        >
+          <p style={{ color: '#595959', marginBottom: 16 }}>
+            For security, enter your own account password to unlock the New Password field.
+          </p>
+          <Form form={verifyForm} layout="vertical" onFinish={handleVerifyPassword}>
+            <Form.Item
+              name="confirm_password"
+              label="Your Account Password"
+              rules={[{ required: true, message: 'Password is required' }]}
+            >
+              <Input.Password placeholder="Enter your password" autoFocus />
+            </Form.Item>
+            <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+              <Space>
+                <Button onClick={() => { setVerifyModalOpen(false); verifyForm.resetFields() }}>Cancel</Button>
+                <Button type="primary" htmlType="submit" loading={verifying} style={{ background: '#111', borderColor: '#111' }}>
+                  Verify
+                </Button>
+              </Space>
+            </Form.Item>
+          </Form>
         </Modal>
     </Layout>
   )
