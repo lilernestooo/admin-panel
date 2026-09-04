@@ -13,24 +13,23 @@ if (empty($data['rec_id'])) {
 }
 
 try {
-    $stmt = $pdo->prepare("
-        UPDATE users SET
-            user_name = :name,
-            user_employee_id = :employee_id,
-            companyid = :companyid,
-            user_dealer_group_code = :dealer_code,
-            user_rights = :rights,
-            calendar_folder = :calendar_folder,
-            user_email_address = :email,
-            user_mobile_no = :mobile,
-            chFunction = :chfunction,
-            extn_id = :extn_id,
-            extn_dial_prefix = :extn_dial_prefix,
-            tg_mobile_no = :tg_mobile_no
-        WHERE rec_id = :id
-    ");
+    // Build the base SET clause
+    $setClause = "
+        user_name = :name,
+        user_employee_id = :employee_id,
+        companyid = :companyid,
+        user_dealer_group_code = :dealer_code,
+        user_rights = :rights,
+        calendar_folder = :calendar_folder,
+        user_email_address = :email,
+        user_mobile_no = :mobile,
+        chFunction = :chfunction,
+        extn_id = :extn_id,
+        extn_dial_prefix = :extn_dial_prefix,
+        tg_mobile_no = :tg_mobile_no
+    ";
 
-    $stmt->execute([
+    $params = [
         ':name'             => $data['user_name'] ?? null,
         ':employee_id'      => $data['user_employee_id'] ?? null,
         ':companyid'        => $data['companyid'] ?? null,
@@ -44,9 +43,28 @@ try {
         ':extn_dial_prefix' => $data['extn_dial_prefix'] ?? null,
         ':tg_mobile_no'     => $data['tg_mobile_no'] ?? null,
         ':id'               => $data['rec_id'],
-    ]);
+    ];
 
-    echo json_encode(["success" => true, "message" => "User updated successfully"]);
+    // Only touch the password if a new one was actually submitted
+    $passwordChanged = !empty($data['new_password']);
+    if ($passwordChanged) {
+        if (strlen($data['new_password']) < 6) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "New password must be at least 6 characters"]);
+            exit();
+        }
+        $setClause .= ", user_password = :new_password, chg_password = 'N', chg_psswrd_datetime = NOW()";
+        $params[':new_password'] = password_hash($data['new_password'], PASSWORD_BCRYPT);
+    }
+
+    $stmt = $pdo->prepare("UPDATE users SET $setClause WHERE rec_id = :id");
+    $stmt->execute($params);
+
+    echo json_encode([
+        "success" => true,
+        "message" => "User updated successfully",
+        "password_changed" => $passwordChanged
+    ]);
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(["success" => false, "message" => "Error: " . $e->getMessage()]);
