@@ -184,7 +184,10 @@ const columns = [
     fixed: 'right',
     width: 180,
     align: 'center',
+    onHeaderCell: () => ({ className: 'actions-divider' }),
+    onCell: () => ({ className: 'actions-divider' }),
     render: (_, record) => (
+
       <Space size="middle">
         <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(record)}>Edit</Button>
         <Popconfirm
@@ -205,22 +208,17 @@ const columns = [
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
       <Layout>
-        <Navbar title="User Registration" />
+        <Navbar title="USER REGISTRATION" />
         <Content style={{ margin: 24 }}>
-          <Row justify="end" style={{ marginBottom: 16 }}>
-            <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal} style={{ background: '#111', borderColor: '#111' }}>
-              Add User
-            </Button>
-          </Row>
 
-       <Row gutter={16} style={{ marginBottom: 24 }}>
+    <Row gutter={16} style={{ marginBottom: 24 }}>
             <Col span={8}>
                 <div style={{ 
-                background: '#fff', 
-                border: '1px solid #e8e8e8', 
-                padding: '24px 20px', 
-                borderRadius: '8px', 
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' 
+                  background: '#fff', 
+                  border: '1px solid #a7a7a7', 
+                  padding: '24px 20px', 
+                  borderRadius: '8px', 
+                  boxShadow: 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)' 
                 }}>
                 <Statistic 
                     title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Total Users</span>} 
@@ -230,13 +228,13 @@ const columns = [
                 </div>
             </Col>
             <Col span={8}>
-                <div style={{ 
+              <div style={{ 
                 background: '#fff', 
-                border: '1px solid #e8e8e8', 
+                border: '1px solid #a7a7a7', 
                 padding: '24px 20px', 
                 borderRadius: '8px', 
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' 
-                }}>
+                boxShadow: 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)' 
+              }}>
                 <Statistic
                     title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Admins</span>}
                     value={users.filter(u => u.user_rights === 'admin').length}
@@ -245,13 +243,13 @@ const columns = [
                 </div>
             </Col>
             <Col span={8}>
-                <div style={{ 
+              <div style={{ 
                 background: '#fff', 
-                border: '1px solid #e8e8e8', 
+                border: '1px solid #a7a7a7', 
                 padding: '24px 20px', 
                 borderRadius: '8px', 
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' 
-                }}>
+                boxShadow: 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)' 
+              }}>
                 <Statistic
                     title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Regular Users</span>}
                     value={users.filter(u => u.user_rights !== 'admin').length}
@@ -261,8 +259,13 @@ const columns = [
             </Col>
             </Row>
 
+            <Row justify="end" style={{ marginBottom: 16 }}>
+              <Button type="primary" icon={<PlusOutlined />} onClick={openAddModal} style={{ background: '#111', borderColor: '#111' }}>
+                Add User
+              </Button>
+            </Row>
 
-          <div style={{ background: '#fff', border: '1px solid #f0f0f0' }}>
+            <div style={{ background: '#fff', border: '1px solid #f0f0f0' }}>
             <Table
             rowKey="rec_id"
             columns={columns}
@@ -351,7 +354,7 @@ const columns = [
             <Space>
             <Button onClick={() => setModalOpen(false)}>Cancel</Button>
             <Button type="primary" htmlType="submit" style={{ background: '#111', borderColor: '#111' }}>
-                {editingUser ? 'Save Changes' : 'Register'}
+                {editingUser ? 'Submit' : 'Submit'}
             </Button>
             </Space>
         </Form.Item>

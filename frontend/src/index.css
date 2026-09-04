@@ -23,6 +23,18 @@ body {
   text-transform: uppercase;
 }
 
+/* Always-visible divider on the fixed Actions column,
+   independent of Ant's scroll-position shadow logic */
+.actions-divider {
+  border-left: 1px solid #d9d9d9 !important;
+  box-shadow: 1px 0 0 0 #ffffff !important;
+}
+
+.ant-table-thead > tr > th.actions-divider {
+  border-left: 1px solid #595959 !important;
+  box-shadow: 1px 0 0 0 #ffffff !important;
+}
+
 .ant-menu-dark .ant-menu-item-selected {
   background: #ffffff !important;
 }
