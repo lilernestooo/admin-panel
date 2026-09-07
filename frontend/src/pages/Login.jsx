@@ -3,6 +3,7 @@ import { Form, Input, Button, Typography, message } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { loginUser } from '../api/userApi'
+import { startSession } from '../utils/session'
 import heroBg from '../assets/ONELGC2019_Final2.jpg'
 
 const { Title, Text } = Typography
@@ -16,14 +17,15 @@ const handleSubmit = async (values) => {
   try {
     const res = await loginUser(values)
     if (res.success) {
-      if (res.user.user_rights !== 'admin') {
-        message.error('You do not have permission to access this page')
-        setLoading(false)
-        return
-      }
-      localStorage.setItem('admin_user', JSON.stringify(res.user))
-      message.success('Welcome back')
-      navigate('/dashboard')
+    if (res.user.user_rights !== 'admin') {
+      message.error('You do not have permission to access this page')
+      setLoading(false)
+      return
+    }
+    localStorage.setItem('admin_user', JSON.stringify(res.user))
+    startSession()
+    message.success('Welcome back')
+    navigate('/dashboard')
     } else {
       message.error(res.message || 'Invalid credentials')
     }
