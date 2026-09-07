@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
   Layout, Table, Button, Modal, Form, Input, Select,
-  Tag, Avatar, Popconfirm, message, Statistic, Row, Col, Typography, Space
+  Tag, Avatar, Popconfirm, message, Statistic, Row, Col, Typography, Space, Divider
 } from 'antd'
 import { UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined, LockOutlined, UnlockOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
@@ -345,6 +345,19 @@ const columns = [
             .lgc-table .ant-table-tbody > tr:last-child > td {
               border-bottom: 1px solid #d9d9d9 !important;
             }
+            .lock-icon {
+              display: inline-flex;
+              padding: 2px 4px;
+              border-radius: 4px;
+              transition: background-color 0.15s ease, transform 0.15s ease;
+            }
+            .lock-icon:not(.unlocked):hover {
+              background-color: #f0f0f0;
+              transform: scale(1.15);
+            }
+            .lock-icon.unlocked {
+              cursor: default;
+            }
           `}</style>
       </Layout>
 
@@ -359,6 +372,8 @@ const columns = [
         keyboard={false}
         styles={{ body: { maxHeight: '70vh', overflowY: 'auto', paddingRight: 8 } }}
         >
+        <div style={{ borderTop: '2px solid #000', marginTop: 0, marginBottom: 20, position: 'sticky',top: 0,background: '#fff', zIndex: 1,}}
+      />
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
         {(() => {
             const fields = [
@@ -394,7 +409,9 @@ const columns = [
                             onClick={() => {
                               if (!passwordUnlocked) setVerifyModalOpen(true)
                             }}
+                            className={passwordUnlocked ? 'lock-icon unlocked' : 'lock-icon'}
                             style={{ cursor: passwordUnlocked ? 'default' : 'pointer', color: passwordUnlocked ? '#52c41a' : '#0a0a0a' }}
+                            title={passwordUnlocked ? 'Password field unlocked' : 'Click to verify your password and unlock'}
                           >
                             {passwordUnlocked ? <UnlockOutlined /> : <LockOutlined />}
                           </span>
@@ -411,6 +428,9 @@ const columns = [
               ]),
             <Form.Item key="company" name="companyid" label="Company">
                 <Input placeholder="Company name or ID" />
+            </Form.Item>,
+            <Form.Item key="dealergroup" name="user_dealer_group_code" label="Dealer Group Code">
+                <Input placeholder="e.g. DG-001" />
             </Form.Item>,
             <Form.Item key="email" name="user_email_address" label="Email" rules={[{ type: 'email', message: 'Enter a valid email' }]}>
                 <Input placeholder="user@example.com" />
@@ -463,11 +483,12 @@ const columns = [
               setVerifyModalOpen(false)
               verifyForm.resetFields()
             }}
-            footer={null}
-            destroyOnClose
-            maskClosable={false}
-            keyboard={false}
+          footer={null}
+          destroyOnClose
+          maskClosable={false}
+          keyboard={false}
           >
+          <Divider style={{ marginTop: 0, marginBottom: 20 }} />
           <p style={{ color: '#595959', marginBottom: 16 }}>
             For security, enter your own account password to unlock the New Password field.
           </p>
