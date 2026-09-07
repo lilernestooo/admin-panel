@@ -16,6 +16,11 @@ export default function Login() {
     try {
       const res = await loginUser(values)
       if (res.success) {
+        if (res.user.user_rights !== 'admin') {
+          message.error('You do not have permission to access this page')
+          setLoading(false)
+          return
+        }
         localStorage.setItem('admin_user', JSON.stringify(res.user))
         message.success('Welcome back')
         navigate('/')
