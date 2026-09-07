@@ -11,27 +11,27 @@ export default function Login() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (values) => {
-    setLoading(true)
-    try {
-      const res = await loginUser(values)
-      if (res.success) {
-        if (res.user.user_rights !== 'admin') {
-          message.error('You do not have permission to access this page')
-          setLoading(false)
-          return
-        }
-        localStorage.setItem('admin_user', JSON.stringify(res.user))
-        message.success('Welcome back')
-        navigate('/')
-      } else {
-        message.error(res.message || 'Invalid credentials')
+const handleSubmit = async (values) => {
+  setLoading(true)
+  try {
+    const res = await loginUser(values)
+    if (res.success) {
+      if (res.user.user_rights !== 'admin') {
+        message.error('You do not have permission to access this page')
+        setLoading(false)
+        return
       }
-    } catch (err) {
-      message.error('Could not reach the backend. Is XAMPP running?')
+      localStorage.setItem('admin_user', JSON.stringify(res.user))
+      message.success('Welcome back')
+      navigate('/dashboard')
+    } else {
+      message.error(res.message || 'Invalid credentials')
     }
-    setLoading(false)
+  } catch (err) {
+    message.error('Could not reach the backend. Is XAMPP running?')
   }
+  setLoading(false)
+}
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh' }}>
