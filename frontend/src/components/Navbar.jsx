@@ -2,6 +2,7 @@ import React from 'react'
 import { Layout, Typography, Avatar, Dropdown, Space } from 'antd'
 import { UserOutlined, DownOutlined, LogoutOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import logo from '../assets/logo.png'
 
 const { Header } = Layout
 const { Title, Text } = Typography
@@ -30,7 +31,10 @@ export default function Navbar({ title }) {
         padding: '0 24px',
       }}
     >
-      <Title level={4} style={{ margin: 0, color: '#fff' }}>{title}</Title>
+      <Space size={16} align="center">
+        <img src={logo} alt="LGC Logo" style={{ height: 32, width: 'auto' }} />
+        <Title level={4} style={{ margin: 0, color: '#fff' }}>{title}</Title>
+      </Space>
 
       <Dropdown menu={{ items: menuItems }} trigger={['click']}>
         <Space style={{ cursor: 'pointer' }}>

@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
 import { fetchUsers } from '../api/userApi'
+import logo from '../assets/logo.png'
 
 const { Content } = Layout
 const { Title, Text } = Typography
@@ -77,31 +78,50 @@ const getStatCardStyle = (key) => ({
           {/* ── Welcome banner ─────────────────────── */}
           <div
             style={{
-              background: '#0a0a0a',
-              borderRadius: 10,
-              padding: '28px 32px',
-              marginBottom: 24,
-              position: 'relative',
-              overflow: 'hidden',
+                background: '#0a0a0a',
+                borderRadius: 10,
+                padding: '28px 32px',
+                marginBottom: 24,
+                position: 'relative',
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
             }}
-          >
+            >
             <div
-              style={{
+                style={{
                 position: 'absolute',
                 top: -40,
                 right: -40,
                 width: 200,
                 height: 200,
                 background: 'radial-gradient(circle, rgba(183,28,28,0.35) 0%, rgba(183,28,28,0) 70%)',
-              }}
+                }}
             />
+
             <div style={{ position: 'relative', zIndex: 1 }}>
-            <Title level={3} style={{ color: '#fff', margin: 0 }}>Welcome back</Title>
-            <Text style={{ color: '#8c8c8c', fontSize: 14 }}>
+                <Title level={3} style={{ color: '#fff', margin: 0 }}>Welcome back</Title>
+                <Text style={{ color: '#8c8c8c', fontSize: 14 }}>
                 Here's what's happening with your user base today.
-            </Text>
+                </Text>
             </div>
-          </div>
+
+            <div
+                style={{
+                position: 'relative',
+                zIndex: 1,
+                background: '#fff',
+                borderRadius: 10,
+                padding: '10px 18px',
+                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.35)',
+                display: 'flex',
+                alignItems: 'center',
+                }}
+            >
+                <img src={logo} alt="LGC Logo" style={{ height: 40, width: 'auto', display: 'block' }} />
+            </div>
+            </div>
 
           {/* ── Stat cards ─────────────────────────── */}
         <Row gutter={16} style={{ marginBottom: 24 }}>
