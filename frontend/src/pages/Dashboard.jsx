@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import {
   Layout, Card, Row, Col, Statistic, Typography, Progress,
-  List, Avatar, Tag, Space, Button, message
+  List, Avatar, Tag, Space, Button, message, Badge
 } from 'antd'
 import {
   TeamOutlined, UserOutlined, SafetyCertificateOutlined,
@@ -25,20 +25,37 @@ export default function Dashboard() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [hoveredCard, setHoveredCard] = useState(null)
-
-  const loadUsers = async () => {
-    setLoading(true)
-    try {
-      const res = await fetchUsers()
-      if (res.success) setUsers(res.data)
-      else message.error(res.message || 'Failed to load users')
-    } catch (err) {
-      message.error('Could not reach the backend. Is XAMPP running?')
-    }
-    setLoading(false)
+  const [, forceTick] = useState(0)
+const loadUsers = async (isBackgroundRefresh = false) => {
+  if (!isBackgroundRefresh) setLoading(true)
+  try {
+    const res = await fetchUsers()
+    if (res.success) setUsers(res.data)
+    else if (!isBackgroundRefresh) message.error(res.message || 'Failed to load users')
+  } catch (err) {
+    if (!isBackgroundRefresh) message.error('Could not reach the backend. Is XAMPP running?')
   }
+  if (!isBackgroundRefresh) setLoading(false)
+}
 
   useEffect(() => { loadUsers() }, [])
+
+// Re-evaluate "active" status every 60s so the indicator updates as time passes,
+// even without new data (e.g. someone crossing the 24h threshold)
+useEffect(() => {
+  const tickInterval = setInterval(() => {
+    forceTick(prev => prev + 1)
+  }, 60 * 1000)
+  return () => clearInterval(tickInterval)
+}, [])
+
+// Silently refetch user data every 30s to catch new logins from other users
+useEffect(() => {
+  const pollInterval = setInterval(() => {
+    loadUsers(true)
+  }, 30 * 1000)
+  return () => clearInterval(pollInterval)
+}, [])
 
   const totalUsers = users.length
   const adminCount = users.filter(u => u.user_rights === 'admin').length
@@ -49,10 +66,16 @@ export default function Dashboard() {
   const neverLoggedIn = users.filter(u => !u.last_loggin).length
   const activePercent = totalUsers ? Math.round(((totalUsers - neverLoggedIn) / totalUsers) * 100) : 0
 
-  const recentUsers = [...users]
-    .filter(u => u.last_loggin)
-    .sort((a, b) => new Date(b.last_loggin) - new Date(a.last_loggin))
-    .slice(0, 5)
+const isActive = (lastLoggin) => {
+  if (!lastLoggin) return false
+  const hoursSinceLogin = (Date.now() - new Date(lastLoggin).getTime()) / (1000 * 60 * 60)
+  return hoursSinceLogin <= 24
+}
+
+const recentUsers = [...users]
+  .filter(u => u.last_loggin)
+  .sort((a, b) => new Date(b.last_loggin) - new Date(a.last_loggin))
+  .slice(0, 5)
 
   const recentlyCreated = [...users]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -298,37 +321,66 @@ const getStatCardStyle = (key) => ({
           <Row gutter={16}>
             <Col span={12}>
               <Card
-                title="Recently Active"
-                style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
-                headStyle={{ fontWeight: 600 }}
-              >
-                {recentUsers.length === 0 ? (
-                  <Text type="secondary">No login activity yet</Text>
-                ) : (
-                  <List
-                    dataSource={recentUsers}
-                    renderItem={(u) => (
-                      <List.Item
-                        style={{ padding: '10px 8px', borderRadius: 6, cursor: 'pointer', transition: 'background-color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        onClick={() => navigate('/')}
-                      >
-                        <List.Item.Meta
-                          avatar={<Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />}
-                          title={<Text strong style={{ fontSize: 13 }}>{u.user_name}</Text>}
-                          description={
-                            <Space size={4} style={{ fontSize: 12, color: '#8c8c8c' }}>
-                              <ClockCircleOutlined />
-                              {new Date(u.last_loggin).toLocaleString()}
-                            </Space>
-                          }
-                        />
-                      </List.Item>
-                    )}
-                  />
-                )}
-              </Card>
+                  title="Recently Active"
+                    extra={
+                      <Space size={10}>
+                        <Space size={4}>
+                          <span
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: '50%',
+                              background: '#52c41a',
+                              display: 'inline-block',
+                              animation: 'pulse 1.5s ease-in-out infinite',
+                            }}
+                          />
+                          <Text type="secondary" style={{ fontSize: 11 }}>Live</Text>
+                        </Space>
+                        <Space size={4}>
+                          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#52c41a', display: 'inline-block' }} />
+                          <Text type="secondary" style={{ fontSize: 12 }}>Active in last 24h</Text>
+                        </Space>
+                      </Space>
+                    }
+                  style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
+                  headStyle={{ fontWeight: 600 }}
+                >
+                  {recentUsers.length === 0 ? (
+                    <Text type="secondary">No login activity yet</Text>
+                  ) : (
+                    <List
+                      dataSource={recentUsers}
+                      renderItem={(u) => (
+                        <List.Item
+                          style={{ padding: '10px 8px', borderRadius: 6, cursor: 'pointer', transition: 'background-color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                          onClick={() => navigate('/')}
+                        >
+                          <List.Item.Meta
+                            avatar={
+                              <Badge
+                                dot
+                                color={isActive(u.last_loggin) ? '#52c41a' : 'transparent'}
+                                offset={[-4, 32]}
+                              >
+                                <Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />
+                              </Badge>
+                            }
+                            title={<Text strong style={{ fontSize: 13 }}>{u.user_name}</Text>}
+                            description={
+                              <Space size={4} style={{ fontSize: 12, color: '#8c8c8c' }}>
+                                <ClockCircleOutlined />
+                                {new Date(u.last_loggin).toLocaleString()}
+                              </Space>
+                            }
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  )}
+                </Card>
             </Col>
 
             <Col span={12}>
@@ -369,7 +421,14 @@ const getStatCardStyle = (key) => ({
                 )}
               </Card>
             </Col>
-          </Row>
+            </Row>
+
+            <style>{`
+            @keyframes pulse {
+              0%, 100% { opacity: 1; transform: scale(1); }
+              50% { opacity: 0.4; transform: scale(1.3); }
+            }
+          `}</style>
 
         </Content>
       </Layout>
