@@ -273,11 +273,11 @@ const columns = [
                   borderRadius: '8px', 
                   boxShadow: 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)' 
                 }}>
-                <Statistic 
-                    title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Total Users</span>} 
-                    value={users.length} 
-                    valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }} 
-                />
+                  <Statistic 
+                      title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Total Users</span>} 
+                      value={users.length} 
+                      valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }} 
+                  />
                 </div>
             </Col>
             <Col span={8}>
@@ -288,11 +288,11 @@ const columns = [
                 borderRadius: '8px', 
                 boxShadow: 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)' 
               }}>
-                <Statistic
-                    title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Admins</span>}
-                    value={users.filter(u => u.user_rights === 'admin').length}
-                    valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }}
-                />
+                  <Statistic
+                      title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Admins</span>}
+                      value={users.filter(u => u.user_rights === 'admin').length}
+                      valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }}
+                  />
                 </div>
             </Col>
             <Col span={8}>
@@ -303,11 +303,11 @@ const columns = [
                 borderRadius: '8px', 
                 boxShadow: 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)' 
               }}>
-                <Statistic
-                    title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px' }}>Regular Users</span>}
-                    value={users.filter(u => u.user_rights !== 'admin').length}
-                    valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }}
-                />
+                  <Statistic
+                      title={<span style={{ color: '#595959', fontWeight: 500, fontSize: '14px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Regular Users</span>}
+                      value={users.filter(u => u.user_rights !== 'admin').length}
+                      valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }}
+                  />
                 </div>
             </Col>
             </Row>

@@ -252,35 +252,50 @@ const getStatCardStyle = (key) => ({
               style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
               headStyle={{ fontWeight: 600 }}
             >
-                {growthData.length === 0 ? (
-                  <Text type="secondary">Not enough data yet to show growth</Text>
-                ) : (
-                  <ResponsiveContainer width="100%" height={260}>
-                    <AreaChart data={growthData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#b71c1c" stopOpacity={0.35} />
-                          <stop offset="95%" stopColor="#b71c1c" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#8c8c8c' }} axisLine={{ stroke: '#e8e8e8' }} tickLine={false} />
-                      <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#8c8c8c' }} axisLine={false} tickLine={false} />
-                      <Tooltip
-                        contentStyle={{ borderRadius: 8, border: '1px solid #eee', fontSize: 13 }}
-                        labelStyle={{ fontWeight: 600 }}
-                      />
-                      <Area
-                        type="monotone"
-                        dataKey="users"
-                        stroke="#0a0a0a"
-                        strokeWidth={2}
-                        fill="url(#growthFill)"
-                        activeDot={{ r: 5, fill: '#b71c1c', stroke: '#fff', strokeWidth: 2 }}
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                )}
+               {growthData.length === 0 ? (
+                    <Text type="secondary">Not enough data yet to show growth</Text>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={280}>
+                      <AreaChart data={growthData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#b71c1c" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#b71c1c" stopOpacity={0.02} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e8" vertical={true} horizontal={true} />
+                        <XAxis
+                          dataKey="date"
+                          tick={{ fontSize: 12, fill: '#595959' }}
+                          axisLine={{ stroke: '#8c8c8c' }}
+                          tickLine={{ stroke: '#8c8c8c' }}
+                          padding={{ left: 10, right: 10 }}
+                        />
+                        <YAxis
+                          allowDecimals={false}
+                          tick={{ fontSize: 12, fill: '#595959' }}
+                          axisLine={{ stroke: '#8c8c8c' }}
+                          tickLine={{ stroke: '#8c8c8c' }}
+                          width={35}
+                        />
+                        <Tooltip
+                          contentStyle={{ borderRadius: 8, border: '1px solid #d9d9d9', fontSize: 13, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                          labelStyle={{ fontWeight: 600, color: '#0a0a0a', marginBottom: 4 }}
+                          formatter={(value) => [`${value} users`, 'Total']}
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="users"
+                          name="Users"
+                          stroke="#b71c1c"
+                          strokeWidth={2.5}
+                          fill="url(#growthFill)"
+                          dot={{ r: 4, fill: '#fff', stroke: '#b71c1c', strokeWidth: 2 }}
+                          activeDot={{ r: 6, fill: '#b71c1c', stroke: '#fff', strokeWidth: 2 }}
+                        />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  )}
               </Card>
             </Col>
 
