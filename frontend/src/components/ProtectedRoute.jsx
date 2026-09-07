@@ -9,7 +9,13 @@ export default function ProtectedRoute({ children, allowedRoles }) {
     return <Navigate to="/login" replace />
   }
 
-  const user = JSON.parse(storedUser)
+  let user
+  try {
+    user = JSON.parse(storedUser)
+  } catch (err) {
+    localStorage.removeItem('admin_user')
+    return <Navigate to="/login" replace />
+  }
 
   if (allowedRoles && !allowedRoles.includes(user.user_rights)) {
     localStorage.removeItem('admin_user')

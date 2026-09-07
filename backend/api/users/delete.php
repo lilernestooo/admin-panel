@@ -1,10 +1,13 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/auth.php';
 
 $database = new Database();
 $pdo = $database->connect();
 
 $data = json_decode(file_get_contents("php://input"), true);
+
+requireAdmin($pdo, $data);
 
 if (empty($data['rec_id'])) {
     http_response_code(400);

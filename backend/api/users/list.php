@@ -1,8 +1,12 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/auth.php';
 
 $database = new Database();
 $pdo = $database->connect();
+
+$requesterId = $_GET['requester_id'] ?? null;
+requireAdmin($pdo, ['requester_id' => $requesterId]);
 
 try {
     $stmt = $pdo->query("
