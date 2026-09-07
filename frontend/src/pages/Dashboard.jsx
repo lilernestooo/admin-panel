@@ -5,8 +5,12 @@ import {
 } from 'antd'
 import {
   TeamOutlined, UserOutlined, SafetyCertificateOutlined,
-  ClockCircleOutlined, ArrowUpOutlined, PlusOutlined, RiseOutlined
+  ClockCircleOutlined, PlusOutlined, RiseOutlined
 } from '@ant-design/icons'
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
+  CartesianGrid, Tooltip
+} from 'recharts'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
@@ -16,11 +20,11 @@ import logo from '../assets/logo.png'
 const { Content } = Layout
 const { Title, Text } = Typography
 
-export default function Overview() {
+export default function Dashboard() {
   const navigate = useNavigate()
-const [users, setUsers] = useState([])
-const [loading, setLoading] = useState(false)
-const [hoveredCard, setHoveredCard] = useState(null)
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [hoveredCard, setHoveredCard] = useState(null)
 
   const loadUsers = async () => {
     setLoading(true)
@@ -54,14 +58,36 @@ const [hoveredCard, setHoveredCard] = useState(null)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 5)
 
+  // ── Build cumulative signup growth data for the chart ──────
+  const growthData = (() => {
+    const withDates = users
+      .filter(u => u.created_at)
+      .map(u => new Date(u.created_at))
+      .sort((a, b) => a - b)
+
+    if (withDates.length === 0) return []
+
+    const counts = {}
+    withDates.forEach(date => {
+      const key = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      counts[key] = (counts[key] || 0) + 1
+    })
+
+    let running = 0
+    return Object.entries(counts).map(([date, count]) => {
+      running += count
+      return { date, users: running }
+    })
+  })()
+
 const getStatCardStyle = (key) => ({
   background: '#fff',
-  border: '1px solid #eee',
+  border: '1px solid #8c8c8c',
   padding: '24px 20px',
   borderRadius: 8,
   boxShadow: hoveredCard === key
-    ? 'inset 4px 0 0 0 #b71c1c, 0 12px 24px rgba(0, 0, 0, 0.15)'
-    : 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.08)',
+    ? 'inset 4px 0 0 0 #b71c1c, 0 12px 24px rgba(0, 0, 0, 0.18)'
+    : 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)',
   height: '100%',
   cursor: 'pointer',
   transform: hoveredCard === key ? 'translateY(-4px)' : 'translateY(0)',
@@ -78,129 +104,167 @@ const getStatCardStyle = (key) => ({
           {/* ── Welcome banner ─────────────────────── */}
           <div
             style={{
-                background: '#0a0a0a',
-                borderRadius: 10,
-                padding: '28px 32px',
-                marginBottom: 24,
-                position: 'relative',
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+              background: '#0a0a0a',
+              borderRadius: 10,
+              padding: '28px 32px',
+              marginBottom: 24,
+              position: 'relative',
+              overflow: 'hidden',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
-            >
+          >
             <div
-                style={{
+              style={{
                 position: 'absolute',
                 top: -40,
                 right: -40,
                 width: 200,
                 height: 200,
                 background: 'radial-gradient(circle, rgba(183,28,28,0.35) 0%, rgba(183,28,28,0) 70%)',
-                }}
+              }}
             />
 
             <div style={{ position: 'relative', zIndex: 1 }}>
-                <Title level={3} style={{ color: '#fff', margin: 0 }}>Welcome back</Title>
-                <Text style={{ color: '#8c8c8c', fontSize: 14 }}>
+              <Title level={3} style={{ color: '#fff', margin: 0 }}>Welcome back</Title>
+              <Text style={{ color: '#8c8c8c', fontSize: 14 }}>
                 Here's what's happening with your user base today.
-                </Text>
+              </Text>
             </div>
-
-            <div
-            style={{
-                position: 'relative',
-                zIndex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                height: '100%',
-            }}
-            >
-            <img
-                src={logo}
-                alt="LGC Logo"
+              <div
                 style={{
-                height: 110,
-                width: 'auto',
-                display: 'block',
-                mixBlendMode: 'screen',
-                WebkitMaskImage: 'linear-gradient(to left, #000 60%, transparent 100%)',
-                maskImage: 'linear-gradient(to left, #000 60%, transparent 100%)',
+                  position: 'relative',
+                  zIndex: 1,
+                  width: 220,
+                  height: 92,
+                  overflow: 'hidden',
+                  display: 'flex',
+                  alignItems: 'flex-start',
                 }}
-            />
-            </div>
-            </div>
+              >
+                <img
+                  src={logo}
+                  alt="LGC Logo"
+                  style={{
+                    width: 220,
+                    height: 'auto',
+                    display: 'block',
+                    mixBlendMode: 'screen',
+                  }}
+                />
+              </div>
+          </div>
 
           {/* ── Stat cards ─────────────────────────── */}
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
-            <div
-            style={getStatCardStyle('total')}
-            onMouseEnter={() => setHoveredCard('total')}
-            onMouseLeave={() => setHoveredCard(null)}
-            onClick={() => navigate('/')}
-            >
-            <Statistic
-                title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Total Users</span>}
-                value={totalUsers}
-                prefix={<TeamOutlined style={{ color: '#0a0a0a', marginRight: 4 }} />}
-                valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
-            />
-            </div>
-        </Col>
-        <Col span={6}>
-            <div
-            style={getStatCardStyle('admins')}
-            onMouseEnter={() => setHoveredCard('admins')}
-            onMouseLeave={() => setHoveredCard(null)}
-            onClick={() => navigate('/')}
-            >
-            <Statistic
-                title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Admins</span>}
-                value={adminCount}
-                prefix={<SafetyCertificateOutlined style={{ color: '#b71c1c', marginRight: 4 }} />}
-                valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
-            />
-            </div>
-        </Col>
-        <Col span={6}>
-            <div
-            style={getStatCardStyle('regular')}
-            onMouseEnter={() => setHoveredCard('regular')}
-            onMouseLeave={() => setHoveredCard(null)}
-            onClick={() => navigate('/')}
-            >
-            <Statistic
-                title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Regular Users</span>}
-                value={regularCount}
-                prefix={<UserOutlined style={{ color: '#0a0a0a', marginRight: 4 }} />}
-                valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
-            />
-            </div>
-        </Col>
-        <Col span={6}>
-            <div
-            style={getStatCardStyle('active')}
-            onMouseEnter={() => setHoveredCard('active')}
-            onMouseLeave={() => setHoveredCard(null)}
-            >
-            <Statistic
-                title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Ever Logged In</span>}
-                value={activePercent}
-                suffix="%"
-                prefix={<RiseOutlined style={{ color: '#389e0d', marginRight: 4 }} />}
-                valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
-            />
-            </div>
-        </Col>
-        </Row>
+          <Row gutter={16} style={{ marginBottom: 24 }}>
+            <Col span={6}>
+              <div
+                style={getStatCardStyle('total')}
+                onMouseEnter={() => setHoveredCard('total')}
+                onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => navigate('/')}
+              >
+                <Statistic
+                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Total Users</span>}
+                  value={totalUsers}
+                  prefix={<TeamOutlined style={{ color: '#0a0a0a', marginRight: 4 }} />}
+                  valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
+                />
+              </div>
+            </Col>
+            <Col span={6}>
+              <div
+                style={getStatCardStyle('admins')}
+                onMouseEnter={() => setHoveredCard('admins')}
+                onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => navigate('/')}
+              >
+                <Statistic
+                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Admins</span>}
+                  value={adminCount}
+                  prefix={<SafetyCertificateOutlined style={{ color: '#b71c1c', marginRight: 4 }} />}
+                  valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
+                />
+              </div>
+            </Col>
+            <Col span={6}>
+              <div
+                style={getStatCardStyle('regular')}
+                onMouseEnter={() => setHoveredCard('regular')}
+                onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => navigate('/')}
+              >
+                <Statistic
+                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Regular Users</span>}
+                  value={regularCount}
+                  prefix={<UserOutlined style={{ color: '#0a0a0a', marginRight: 4 }} />}
+                  valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
+                />
+              </div>
+            </Col>
+            <Col span={6}>
+              <div
+                style={getStatCardStyle('active')}
+                onMouseEnter={() => setHoveredCard('active')}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
+                <Statistic
+                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Ever Logged In</span>}
+                  value={activePercent}
+                  suffix="%"
+                  prefix={<RiseOutlined style={{ color: '#389e0d', marginRight: 4 }} />}
+                  valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
+                />
+              </div>
+            </Col>
+          </Row>
 
-          <Row gutter={16}>
-            {/* ── Role distribution ──────────────────── */}
+          {/* ── Chart + Role Distribution (grouped together as "analytics") ── */}
+          <Row gutter={16} style={{ marginBottom: 24 }}>
+            <Col span={16}>
+            <Card
+              title="User Growth"
+              extra={<Text type="secondary" style={{ fontSize: 12 }}>Cumulative signups over time</Text>}
+              style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
+              headStyle={{ fontWeight: 600 }}
+            >
+                {growthData.length === 0 ? (
+                  <Text type="secondary">Not enough data yet to show growth</Text>
+                ) : (
+                  <ResponsiveContainer width="100%" height={260}>
+                    <AreaChart data={growthData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="growthFill" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#b71c1c" stopOpacity={0.35} />
+                          <stop offset="95%" stopColor="#b71c1c" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#8c8c8c' }} axisLine={{ stroke: '#e8e8e8' }} tickLine={false} />
+                      <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: '#8c8c8c' }} axisLine={false} tickLine={false} />
+                      <Tooltip
+                        contentStyle={{ borderRadius: 8, border: '1px solid #eee', fontSize: 13 }}
+                        labelStyle={{ fontWeight: 600 }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="users"
+                        stroke="#0a0a0a"
+                        strokeWidth={2}
+                        fill="url(#growthFill)"
+                        activeDot={{ r: 5, fill: '#b71c1c', stroke: '#fff', strokeWidth: 2 }}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
+              </Card>
+            </Col>
+
             <Col span={8}>
               <Card
                 title="Role Distribution"
-                style={{ borderRadius: 8, height: '100%' }}
+                style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
                 headStyle={{ fontWeight: 600 }}
               >
                 <div style={{ marginBottom: 20 }}>
@@ -210,7 +274,7 @@ const getStatCardStyle = (key) => ({
                   </div>
                   <Progress percent={adminPercent} strokeColor="#0a0a0a" showInfo={false} />
                 </div>
-                <div>
+                <div style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
                     <Text>Regular Users</Text>
                     <Text strong>{regularCount}</Text>
@@ -221,33 +285,35 @@ const getStatCardStyle = (key) => ({
                 <Button
                   block
                   icon={<PlusOutlined />}
-                  style={{ marginTop: 24, background: '#111', borderColor: '#111', color: '#fff' }}
+                  style={{ background: '#111', borderColor: '#111', color: '#fff' }}
                   onClick={() => navigate('/')}
                 >
                   Manage Users
                 </Button>
               </Card>
             </Col>
+          </Row>
 
-            {/* ── Recently active ────────────────────── */}
-            <Col span={8}>
+          {/* ── Recently active / added (grouped together as "activity feed") ── */}
+          <Row gutter={16}>
+            <Col span={12}>
               <Card
                 title="Recently Active"
-                style={{ borderRadius: 8, height: '100%' }}
+                style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
                 headStyle={{ fontWeight: 600 }}
               >
                 {recentUsers.length === 0 ? (
                   <Text type="secondary">No login activity yet</Text>
                 ) : (
-                    <List
+                  <List
                     dataSource={recentUsers}
                     renderItem={(u) => (
-                        <List.Item
+                      <List.Item
                         style={{ padding: '10px 8px', borderRadius: 6, cursor: 'pointer', transition: 'background-color 0.15s ease' }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                         onClick={() => navigate('/')}
-                        >
+                      >
                         <List.Item.Meta
                           avatar={<Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />}
                           title={<Text strong style={{ fontSize: 13 }}>{u.user_name}</Text>}
@@ -265,25 +331,24 @@ const getStatCardStyle = (key) => ({
               </Card>
             </Col>
 
-            {/* ── Recently added ─────────────────────── */}
-            <Col span={8}>
+            <Col span={12}>
               <Card
                 title="Recently Added"
-                style={{ borderRadius: 8, height: '100%' }}
+                style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
                 headStyle={{ fontWeight: 600 }}
               >
                 {recentlyCreated.length === 0 ? (
                   <Text type="secondary">No users yet</Text>
                 ) : (
-                    <List
+                  <List
                     dataSource={recentlyCreated}
                     renderItem={(u) => (
-                        <List.Item
+                      <List.Item
                         style={{ padding: '10px 8px', borderRadius: 6, cursor: 'pointer', transition: 'background-color 0.15s ease' }}
                         onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                         onClick={() => navigate('/')}
-                        >
+                      >
                         <List.Item.Meta
                           avatar={<Avatar style={{ backgroundColor: '#fff', border: '1px solid #d9d9d9', color: '#0a0a0a' }} icon={<UserOutlined />} />}
                           title={<Text strong style={{ fontSize: 13 }}>{u.user_name}</Text>}
