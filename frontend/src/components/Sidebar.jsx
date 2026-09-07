@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Layout, Menu, Typography } from 'antd'
 import {
   TeamOutlined, SettingOutlined,
@@ -13,7 +13,15 @@ const { Title, Text } = Typography
 export default function Sidebar() {
   const navigate = useNavigate()
   const location = useLocation()
-  const [collapsed, setCollapsed] = useState(false)
+
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebar_collapsed')
+    return saved === 'true'
+  })
+
+  useEffect(() => {
+    localStorage.setItem('sidebar_collapsed', collapsed)
+  }, [collapsed])
 
   const selectedKey = location.pathname === '/' ? 'users' : location.pathname.replace('/', '')
 
@@ -60,7 +68,18 @@ export default function Sidebar() {
         selectedKeys={[selectedKey]}
         style={{ background: '#0a0a0a', borderRight: 'none', marginTop: 12 }}
         items={[
-          { key: 'dashboard', icon: <DashboardIcon style={{ fontSize: 16 }} />, label: 'Dashboard' },
+          {
+            key: 'dashboard',
+            icon: (
+              <DashboardIcon
+                style={{
+                  fontSize: 16,
+                  color: selectedKey === 'dashboard' ? '#0a0a0a' : '#fff',
+                }}
+              />
+            ),
+            label: 'Dashboard',
+          },
           { key: 'users', icon: <TeamOutlined />, label: 'Users' },
           { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
         ]}

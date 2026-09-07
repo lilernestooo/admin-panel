@@ -108,18 +108,26 @@ const getStatCardStyle = (key) => ({
             </div>
 
             <div
-                style={{
+            style={{
                 position: 'relative',
                 zIndex: 1,
-                background: '#fff',
-                borderRadius: 10,
-                padding: '10px 18px',
-                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.35)',
                 display: 'flex',
                 alignItems: 'center',
-                }}
+                height: '100%',
+            }}
             >
-                <img src={logo} alt="LGC Logo" style={{ height: 40, width: 'auto', display: 'block' }} />
+            <img
+                src={logo}
+                alt="LGC Logo"
+                style={{
+                height: 110,
+                width: 'auto',
+                display: 'block',
+                mixBlendMode: 'screen',
+                WebkitMaskImage: 'linear-gradient(to left, #000 60%, transparent 100%)',
+                maskImage: 'linear-gradient(to left, #000 60%, transparent 100%)',
+                }}
+            />
             </div>
             </div>
 
