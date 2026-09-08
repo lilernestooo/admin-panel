@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/auth.php';
+require_once __DIR__ . '/../../config/audit.php';
 
 $database = new Database();
 $pdo = $database->connect();
@@ -56,6 +57,8 @@ $stmt->execute([
     ':extn_dial_prefix'  => $data['extn_dial_prefix'] ?? null,
     ':tg_mobile_no'      => $data['tg_mobile_no'] ?? null,
 ]);
+
+    logAudit($pdo, 'CREATE', $data['requester_id'], $data['userid'], $data['user_name']);
 
     echo json_encode(["success" => true, "message" => "User registered successfully", "id" => $pdo->lastInsertId()]);
 } catch (PDOException $e) {

@@ -81,27 +81,45 @@ const recentUsers = [...users]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 5)
 
-  // ── Build cumulative signup growth data for the chart ──────
-  const growthData = (() => {
-    const withDates = users
-      .filter(u => u.created_at)
-      .map(u => new Date(u.created_at))
-      .sort((a, b) => a - b)
+      // ── Build cumulative signup growth data for the chart ──────
+      const growthData = (() => {
+        const withDates = users
+          .filter(u => u.created_at)
+          .map(u => new Date(u.created_at))
+          .sort((a, b) => a - b)
 
-    if (withDates.length === 0) return []
+        if (withDates.length === 0) return []
 
-    const counts = {}
-    withDates.forEach(date => {
-      const key = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-      counts[key] = (counts[key] || 0) + 1
-    })
+        // Count signups per calendar day (using a sortable YYYY-MM-DD key)
+        const countsByDay = {}
+        withDates.forEach(date => {
+          const dayKey = date.toISOString().split('T')[0] // e.g. "2026-09-03"
+          countsByDay[dayKey] = (countsByDay[dayKey] || 0) + 1
+        })
 
-    let running = 0
-    return Object.entries(counts).map(([date, count]) => {
-      running += count
-      return { date, users: running }
-    })
-  })()
+        // Walk every calendar day from the first signup to today,
+        // carrying the running total forward on days with no new signups
+        const firstDay = new Date(withDates[0])
+        firstDay.setHours(0, 0, 0, 0)
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+
+        const data = []
+        let running = 0
+        const cursor = new Date(firstDay)
+
+        while (cursor <= today) {
+          const dayKey = cursor.toISOString().split('T')[0]
+          running += countsByDay[dayKey] || 0
+          data.push({
+            date: cursor.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            users: running,
+          })
+          cursor.setDate(cursor.getDate() + 1)
+        }
+
+        return data
+      })()
 
 const getStatCardStyle = (key) => ({
   background: '#fff',
@@ -150,9 +168,9 @@ const getStatCardStyle = (key) => ({
             />
 
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <Title level={3} style={{ color: '#fff', margin: 0 }}>Welcome back</Title>
+              <Title level={3} style={{ color: '#fff', margin: 0 }}>WELCOME BACK</Title>
               <Text style={{ color: '#8c8c8c', fontSize: 14 }}>
-                Here's what's happening with your user base today.
+                HERE'S WHAT'S HAPPENING WITH YOUR USER BASE TODAY.
               </Text>
             </div>
               <div
@@ -168,7 +186,7 @@ const getStatCardStyle = (key) => ({
               >
                 <img
                   src={logo}
-                  alt="LGC Logo"
+                  alt="LGC LOGO"
                   style={{
                     width: 220,
                     height: 'auto',
@@ -189,7 +207,7 @@ const getStatCardStyle = (key) => ({
                 onClick={() => navigate('/')}
               >
                 <Statistic
-                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Total Users</span>}
+                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>TOTAL USERS</span>}
                   value={totalUsers}
                   prefix={<TeamOutlined style={{ color: '#0a0a0a', marginRight: 4 }} />}
                   valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
@@ -204,7 +222,7 @@ const getStatCardStyle = (key) => ({
                 onClick={() => navigate('/')}
               >
                 <Statistic
-                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Admins</span>}
+                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>ADMINS</span>}
                   value={adminCount}
                   prefix={<SafetyCertificateOutlined style={{ color: '#b71c1c', marginRight: 4 }} />}
                   valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
@@ -219,7 +237,7 @@ const getStatCardStyle = (key) => ({
                 onClick={() => navigate('/')}
               >
                 <Statistic
-                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Regular Users</span>}
+                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>REGULAR USERS</span>}
                   value={regularCount}
                   prefix={<UserOutlined style={{ color: '#0a0a0a', marginRight: 4 }} />}
                   valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
@@ -233,7 +251,7 @@ const getStatCardStyle = (key) => ({
                 onMouseLeave={() => setHoveredCard(null)}
               >
                 <Statistic
-                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>Ever Logged In</span>}
+                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>EVER LOGGED IN</span>}
                   value={activePercent}
                   suffix="%"
                   prefix={<RiseOutlined style={{ color: '#389e0d', marginRight: 4 }} />}
@@ -247,13 +265,13 @@ const getStatCardStyle = (key) => ({
           <Row gutter={16} style={{ marginBottom: 24 }}>
             <Col span={16}>
             <Card
-              title="User Growth"
-              extra={<Text type="secondary" style={{ fontSize: 12 }}>Cumulative signups over time</Text>}
+            title="USER GROWTH"
+            extra={<Text type="secondary" style={{ fontSize: 12 }}>CUMULATIVE SIGNUPS OVER TIME</Text>}
               style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
               headStyle={{ fontWeight: 600 }}
             >
                {growthData.length === 0 ? (
-                    <Text type="secondary">Not enough data yet to show growth</Text>
+                    <Text type="secondary">NOT ENOUGH DATA YET TO SHOW GROWTH</Text>
                   ) : (
                     <ResponsiveContainer width="100%" height={280}>
                       <AreaChart data={growthData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
@@ -281,7 +299,7 @@ const getStatCardStyle = (key) => ({
                         <Tooltip
                           contentStyle={{ borderRadius: 8, border: '1px solid #d9d9d9', fontSize: 13, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                           labelStyle={{ fontWeight: 600, color: '#0a0a0a', marginBottom: 4 }}
-                          formatter={(value) => [`${value} users`, 'Total']}
+                          formatter={(value) => [`${value} users`, 'TOTAL']}
                         />
                         <Area
                           type="monotone"
@@ -301,20 +319,20 @@ const getStatCardStyle = (key) => ({
 
             <Col span={8}>
               <Card
-                title="Role Distribution"
+                title="ROLE DISTRIBUTION"
                 style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
                 headStyle={{ fontWeight: 600 }}
               >
                 <div style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <Text>Admins</Text>
+                    <Text>ADMINS</Text>
                     <Text strong>{adminCount}</Text>
                   </div>
                   <Progress percent={adminPercent} strokeColor="#0a0a0a" showInfo={false} />
                 </div>
                 <div style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                    <Text>Regular Users</Text>
+                    <Text>REGULAR USERS</Text>
                     <Text strong>{regularCount}</Text>
                   </div>
                   <Progress percent={regularPercent} strokeColor="#b71c1c" showInfo={false} />
@@ -326,7 +344,7 @@ const getStatCardStyle = (key) => ({
                   style={{ background: '#111', borderColor: '#111', color: '#fff' }}
                   onClick={() => navigate('/')}
                 >
-                  Manage Users
+                  MANAGE USERS
                 </Button>
               </Card>
             </Col>
@@ -336,7 +354,7 @@ const getStatCardStyle = (key) => ({
           <Row gutter={16}>
             <Col span={12}>
               <Card
-                  title="Recently Active"
+                  title="RECENTLY ACTIVE"
                     extra={
                       <Space size={10}>
                         <Space size={4}>
@@ -350,11 +368,11 @@ const getStatCardStyle = (key) => ({
                               animation: 'pulse 1.5s ease-in-out infinite',
                             }}
                           />
-                          <Text type="secondary" style={{ fontSize: 11 }}>Live</Text>
+                          <Text type="secondary" style={{ fontSize: 11 }}>LIVE</Text>
                         </Space>
                         <Space size={4}>
                           <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#52c41a', display: 'inline-block' }} />
-                          <Text type="secondary" style={{ fontSize: 12 }}>Active in last 24h</Text>
+                          <Text type="secondary" style={{ fontSize: 12 }}>ACTIVE IN LAST 24H</Text>
                         </Space>
                       </Space>
                     }
@@ -362,7 +380,7 @@ const getStatCardStyle = (key) => ({
                   headStyle={{ fontWeight: 600 }}
                 >
                   {recentUsers.length === 0 ? (
-                    <Text type="secondary">No login activity yet</Text>
+                    <Text type="secondary">NO LOGIN ACTIVITY YET</Text>
                   ) : (
                     <List
                       dataSource={recentUsers}
@@ -400,12 +418,12 @@ const getStatCardStyle = (key) => ({
 
             <Col span={12}>
               <Card
-                title="Recently Added"
+                title="RECENTLY ADDED"
                 style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
                 headStyle={{ fontWeight: 600 }}
               >
                 {recentlyCreated.length === 0 ? (
-                  <Text type="secondary">No users yet</Text>
+                  <Text type="secondary">NO USERS YET</Text>
                 ) : (
                   <List
                     dataSource={recentlyCreated}

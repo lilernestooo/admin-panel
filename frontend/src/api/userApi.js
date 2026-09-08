@@ -55,3 +55,9 @@ export async function verifyPassword(payload) {
   })
   return res.json()
 }
+
+export async function fetchAuditLogs() {
+  const requesterId = getRequesterId()
+  const res = await fetch(`${BASE_URL}/list_audit.php?requester_id=${encodeURIComponent(requesterId)}`)
+  return res.json()
+}

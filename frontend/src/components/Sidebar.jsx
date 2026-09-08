@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Layout, Menu, Typography } from 'antd'
 import {
-  TeamOutlined, SettingOutlined,
+  TeamOutlined, SettingOutlined, FileSearchOutlined,
   MenuFoldOutlined, MenuUnfoldOutlined
 } from '@ant-design/icons'
 import DashboardIcon from '@mui/icons-material/Dashboard'
@@ -45,7 +45,7 @@ export default function Sidebar() {
         {!collapsed && (
           <div>
             <Title level={4} style={{ color: '#fff', margin: 0, letterSpacing: 0.5 }}>ADMIN PANEL</Title>
-            <Text style={{ color: '#8c8c8c', fontSize: 12 }}>User Management</Text>
+            <Text style={{ color: '#8c8c8c', fontSize: 12 }}>USER MANAGEMENT</Text>
           </div>
         )}
         <div
@@ -81,7 +81,8 @@ export default function Sidebar() {
             label: 'Dashboard',
           },
           { key: 'users', icon: <TeamOutlined />, label: 'Users' },
-          { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
+          { key: 'audit-log', icon: <FileSearchOutlined />, label: 'Audit Log' },
+         // { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },//
         ]}
         onClick={({ key }) => {
           if (key === 'users') navigate('/')

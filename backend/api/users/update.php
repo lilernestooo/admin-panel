@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../config/auth.php';
+require_once __DIR__ . '/../../config/audit.php';
 
 $database = new Database();
 $pdo = $database->connect();
@@ -16,6 +17,11 @@ if (empty($data['rec_id'])) {
 }
 
 try {
+    // Capture the target user's identity before updating, for the audit log
+    $existing = $pdo->prepare("SELECT userid FROM users WHERE rec_id = ?");
+    $existing->execute([$data['rec_id']]);
+    $existingUser = $existing->fetch();
+
     // Build the base SET clause
     $setClause = "
         user_name = :name,
@@ -62,6 +68,14 @@ try {
 
     $stmt = $pdo->prepare("UPDATE users SET $setClause WHERE rec_id = :id");
     $stmt->execute($params);
+
+    logAudit(
+        $pdo,
+        $passwordChanged ? 'UPDATE (password changed)' : 'UPDATE',
+        $data['requester_id'],
+        $existingUser['userid'] ?? null,
+        $data['user_name'] ?? null
+    );
 
     echo json_encode([
         "success" => true,

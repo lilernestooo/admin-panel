@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/Login'
 import User from './pages/User'
 import Dashboard from './pages/Dashboard'
+import AuditLog from './pages/AuditLog'
 import ProtectedRoute from './components/ProtectedRoute'
 import SessionManager from './components/SessionManager'
 
@@ -25,6 +26,14 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/audit-log"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AuditLog />
             </ProtectedRoute>
           }
         />
