@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Layout, Menu, Typography } from 'antd'
 import {
-  TeamOutlined, SettingOutlined, FileSearchOutlined,
+  TeamOutlined, SettingOutlined, FileSearchOutlined, ToolOutlined,
+  ShopOutlined, ApartmentOutlined,
   MenuFoldOutlined, MenuUnfoldOutlined
 } from '@ant-design/icons'
 import DashboardIcon from '@mui/icons-material/Dashboard'
@@ -66,6 +67,7 @@ export default function Sidebar() {
         theme="dark"
         mode="inline"
         selectedKeys={[selectedKey]}
+        defaultOpenKeys={['maintenance']}
         style={{ background: '#0a0a0a', borderRight: 'none', marginTop: 12 }}
         items={[
           {
@@ -80,9 +82,18 @@ export default function Sidebar() {
             ),
             label: 'Dashboard',
           },
-          { key: 'users', icon: <TeamOutlined />, label: 'Users' },
+          {
+            key: 'maintenance',
+            icon: <ToolOutlined />,
+            label: 'Maintenance',
+            children: [
+              { key: 'users', icon: <TeamOutlined />, label: 'Users' },
+              { key: 'dealers', icon: <ShopOutlined />, label: 'Dealers' },
+              { key: 'company', icon: <ApartmentOutlined />, label: 'Company' },
+            ],
+          },
           { key: 'audit-log', icon: <FileSearchOutlined />, label: 'Audit Log' },
-         // { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },//
+          // { key: 'settings', icon: <SettingOutlined />, label: 'Settings' },
         ]}
         onClick={({ key }) => {
           if (key === 'users') navigate('/')

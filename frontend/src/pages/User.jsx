@@ -333,32 +333,40 @@ const columns = [
             </div>
         </Content>
           <style>{`
-            .lgc-table .ant-table-thead > tr > th,
-            .lgc-table .ant-table-tbody > tr > td {
-              border-right: 1px solid #d9d9d9 !important;
-              border-bottom: 1px solid #d9d9d9 !important;
-            }
-            .lgc-table .ant-table-container {
-              border-left: 1px solid #d9d9d9 !important;
-              border-top: 1px solid #d9d9d9 !important;
-            }
-            .lgc-table .ant-table-tbody > tr:last-child > td {
-              border-bottom: 1px solid #d9d9d9 !important;
-            }
-            .lock-icon {
-              display: inline-flex;
-              padding: 2px 4px;
-              border-radius: 4px;
-              transition: background-color 0.15s ease, transform 0.15s ease;
-            }
-            .lock-icon:not(.unlocked):hover {
-              background-color: #f0f0f0;
-              transform: scale(1.15);
-            }
-            .lock-icon.unlocked {
-              cursor: default;
-            }
-          `}</style>
+          .lgc-table .ant-table-thead > tr > th,
+          .lgc-table .ant-table-tbody > tr > td {
+            border-right: 1px solid #d9d9d9 !important;
+            border-bottom: 1px solid #d9d9d9 !important;
+          }
+          .lgc-table .ant-table-container {
+            border-left: 1px solid #d9d9d9 !important;
+            border-top: 1px solid #d9d9d9 !important;
+          }
+          .lgc-table .ant-table-tbody > tr:last-child > td {
+            border-bottom: 1px solid #d9d9d9 !important;
+          }
+          .lock-icon {
+            display: inline-flex;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background-color 0.15s ease, transform 0.15s ease;
+          }
+          .lock-icon:not(.unlocked):hover {
+            background-color: #f0f0f0;
+            transform: scale(1.15);
+          }
+          .lock-icon.unlocked {
+            cursor: default;
+          }
+          .lgc-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+            background-color: #b4adad !important;
+            color: #0a0a0a !important;
+            font-weight: 600;
+          }
+          .lgc-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+            background-color: #b4adad !important;
+          }
+        `}</style>
       </Layout>
 
         <Modal
@@ -386,6 +394,8 @@ const columns = [
                     { value: 'admin', label: 'Admin' },
                     { value: 'user', label: 'User' },
                 ]}
+                getPopupContainer={(trigger) => trigger.parentNode}
+                popupClassName="lgc-select-dropdown"
                 />
             </Form.Item>,
             <Form.Item key="name" name="user_name" label="Full Name" rules={[{ required: true, message: 'Name is required' }]}>

@@ -1,4 +1,4 @@
-export const SESSION_TIMEOUT_MS = 30 * 60 * 1000 // 30 minutes
+export const SESSION_TIMEOUT_MS = 8 * 60 * 60 * 1000 // 8 hours
 
 export function startSession() {
   const now = Date.now()
