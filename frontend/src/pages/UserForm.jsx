@@ -39,6 +39,14 @@ export default function UserForm() {
   const [verifyModalOpen, setVerifyModalOpen] = useState(false)
   const [verifying, setVerifying] = useState(false)
 
+  // -- Set the browser/tab title -----------------------------------------
+  // These forms are opened in their own new tab (via window.open), so the
+  // tab title is the only thing that tells the user which form they're on
+  // when they have several open at once.
+  useEffect(() => {
+    document.title = isEditing ? 'Admin - Edit User' : 'Admin - Register New User'
+  }, [isEditing])
+
   // -- Load the existing user when editing ----------------------------
   useEffect(() => {
     if (!isEditing) return
@@ -155,6 +163,16 @@ export default function UserForm() {
           { value: 'admin', label: 'Admin' },
           { value: 'user', label: 'User' },
         ]}
+        getPopupContainer={(trigger) => trigger.parentNode}
+        popupClassName="lgc-select-dropdown"
+      />
+    </Form.Item>,
+    <Form.Item key="website" name="website_access" label="Website Access" rules={[{ required: true, message: 'Please select a website' }]}>
+      <Select
+        placeholder="Select a website"
+        // TODO: replace with the real list of websites once finalized
+        options={[]}
+        notFoundContent="No websites configured yet"
         getPopupContainer={(trigger) => trigger.parentNode}
         popupClassName="lgc-select-dropdown"
       />
@@ -307,6 +325,23 @@ export default function UserForm() {
           }
           .lgc-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
             background-color: #b4adad !important;
+          }
+
+          .ant-form-item-label > label {
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+          }
+          .ant-select-item-option-content,
+          .ant-select-selection-item {
+            text-transform: uppercase;
+          }
+          .ant-btn {
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          .ant-modal-title {
+            text-transform: uppercase;
           }
         `}</style>
       </Layout>

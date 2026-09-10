@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import {
   Layout, Table, Button, Modal, Popconfirm, message, Statistic, Row, Col,
-  Typography, Space, Tag, Avatar,
+  Typography, Space, Tag, Avatar, Segmented, Descriptions,
 } from 'antd'
 import {
   UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined,
-  SafetyCertificateOutlined, InfoCircleOutlined,
+  SafetyCertificateOutlined, InfoCircleOutlined, TeamOutlined,
+  PlusCircleFilled, MinusCircleFilled,
 } from '@ant-design/icons'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
@@ -20,7 +21,7 @@ export default function User() {
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [infoUser, setInfoUser] = useState(null)
-  const [showExtraColumns, setShowExtraColumns] = useState(false)
+  const [rightsFilter, setRightsFilter] = useState('all') // 'all' | 'admin' | 'user'
 
   // -- Data loading ---------------------------------------------------
   const loadUsers = async () => {
@@ -63,12 +64,16 @@ export default function User() {
 
   const filteredUsers = users.filter((u) => {
     const term = searchTerm.toLowerCase()
-    return (
+    const matchesSearch =
       u.user_name?.toLowerCase().includes(term) ||
       u.userid?.toLowerCase().includes(term) ||
       u.user_email_address?.toLowerCase().includes(term) ||
       u.companyid?.toLowerCase().includes(term)
-    )
+
+    const matchesRights =
+      rightsFilter === 'all' || (u.user_rights || 'user') === rightsFilter
+
+    return matchesSearch && matchesRights
   })
 
   const dateOrDash = (val, fallback = '-') => (val ? new Date(val).toLocaleString() : <Text type="secondary">{fallback}</Text>)
@@ -95,27 +100,6 @@ export default function User() {
     },
     { title: 'Email', dataIndex: 'user_email_address', key: 'user_email_address', width: 240, align: 'center', ellipsis: true },
     { title: 'Mobile', dataIndex: 'user_mobile_no', key: 'user_mobile_no', width: 150, align: 'center' },
-
-    // Extra fields, shown once "System Access" is toggled on for an admin row
-    ...(showExtraColumns ? [
-      { title: 'TG Mobile No', dataIndex: 'tg_mobile_no', key: 'tg_mobile_no', width: 160, align: 'center' },
-      { title: 'Extension ID', dataIndex: 'extn_id', key: 'extn_id', width: 150, align: 'center' },
-      { title: 'Extn Dial Prefix', dataIndex: 'extn_dial_prefix', key: 'extn_dial_prefix', width: 150, align: 'center' },
-      { title: 'Company', dataIndex: 'companyid', key: 'companyid', width: 160, align: 'center' },
-      { title: 'Dealer Group Code', dataIndex: 'user_dealer_group_code', key: 'user_dealer_group_code', width: 160, align: 'center' },
-      { title: 'Function', dataIndex: 'chFunction', key: 'chFunction', width: 150, align: 'center' },
-      { title: 'Calendar Folder', dataIndex: 'calendar_folder', key: 'calendar_folder', width: 160, align: 'center' },
-      {
-        title: 'Force Change PW', dataIndex: 'chg_password', key: 'chg_password', width: 150, align: 'center',
-        render: (val) => <Tag style={{ borderRadius: 0, margin: 0 }}>{val === 'Y' ? 'Yes' : 'No'}</Tag>,
-      },
-      { title: 'PW Changed At', dataIndex: 'chg_psswrd_datetime', key: 'chg_psswrd_datetime', width: 180, align: 'center', render: (v) => dateOrDash(v) },
-      { title: 'OTP Code', dataIndex: 'otp_code', key: 'otp_code', width: 120, align: 'center' },
-      { title: 'OTP Expires At', dataIndex: 'otp_expires_at', key: 'otp_expires_at', width: 180, align: 'center', render: (v) => dateOrDash(v) },
-      { title: 'Last Login', dataIndex: 'last_loggin', key: 'last_loggin', width: 180, align: 'center', render: (v) => dateOrDash(v, 'Never') },
-      { title: 'Created At', dataIndex: 'created_at', key: 'created_at', width: 180, align: 'center', render: (v) => dateOrDash(v) },
-      { title: 'Updated At', dataIndex: 'updated_at', key: 'updated_at', width: 180, align: 'center', render: (v) => dateOrDash(v) },
-    ] : []),
 
     {
       title: 'Rights', dataIndex: 'user_rights', key: 'user_rights', width: 120, align: 'center',
@@ -171,9 +155,42 @@ export default function User() {
             </Col>
           </Row>
 
-          {/* Search + Add */}
+          {/* Search + Filter + Add */}
           <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
-            <UserSearchBar onSearch={setSearchTerm} />
+            <Space>
+              <UserSearchBar onSearch={setSearchTerm} />
+              <Segmented
+                value={rightsFilter}
+                onChange={setRightsFilter}
+                className="lgc-segmented"
+                options={[
+                  {
+                    label: (
+                      <span className="lgc-seg-option">
+                        <TeamOutlined /> All <Tag className="lgc-seg-count">{users.length}</Tag>
+                      </span>
+                    ),
+                    value: 'all',
+                  },
+                  {
+                    label: (
+                      <span className="lgc-seg-option">
+                        <SafetyCertificateOutlined /> Admins <Tag className="lgc-seg-count">{adminCount}</Tag>
+                      </span>
+                    ),
+                    value: 'admin',
+                  },
+                  {
+                    label: (
+                      <span className="lgc-seg-option">
+                        <UserOutlined /> Users <Tag className="lgc-seg-count">{users.length - adminCount}</Tag>
+                      </span>
+                    ),
+                    value: 'user',
+                  },
+                ]}
+              />
+            </Space>
             <Button
               type="primary"
               icon={<PlusOutlined />}
@@ -192,10 +209,42 @@ export default function User() {
               dataSource={filteredUsers}
               loading={loading}
               pagination={{ pageSize: 10 }}
-              scroll={{ x: showExtraColumns ? 3000 : 900, y: 480 }}
+              scroll={{ x: 900, y: 480 }}
               sticky
               bordered
               className="lgc-table"
+              expandable={{
+                rowExpandable: (record) => record.user_rights === 'admin',
+                expandIcon: ({ expanded, onExpand, record, expandable }) =>
+                  expandable ? (
+                    <Button
+                      type="text"
+                      shape="circle"
+                      size="small"
+                      onClick={(e) => onExpand(record, e)}
+                      icon={expanded ? <MinusCircleFilled /> : <PlusCircleFilled />}
+                      className={`lgc-expand-btn ${expanded ? 'lgc-expand-open' : ''}`}
+                    />
+                  ) : null,
+                expandedRowRender: (record) => (
+                  <Descriptions size="small" column={3} bordered style={{ margin: '4px 0' }}>
+                    <Descriptions.Item label="TG Mobile No">{record.tg_mobile_no || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Extension ID">{record.extn_id || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Extn Dial Prefix">{record.extn_dial_prefix || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Company">{record.companyid || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Dealer Group Code">{record.user_dealer_group_code || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Function">{record.chFunction || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Calendar Folder">{record.calendar_folder || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="Force Change PW">{record.chg_password === 'Y' ? 'Yes' : 'No'}</Descriptions.Item>
+                    <Descriptions.Item label="PW Changed At">{dateOrDash(record.chg_psswrd_datetime)}</Descriptions.Item>
+                    <Descriptions.Item label="OTP Code">{record.otp_code || '-'}</Descriptions.Item>
+                    <Descriptions.Item label="OTP Expires At">{dateOrDash(record.otp_expires_at)}</Descriptions.Item>
+                    <Descriptions.Item label="Last Login">{dateOrDash(record.last_loggin, 'Never')}</Descriptions.Item>
+                    <Descriptions.Item label="Created At">{dateOrDash(record.created_at)}</Descriptions.Item>
+                    <Descriptions.Item label="Updated At">{dateOrDash(record.updated_at)}</Descriptions.Item>
+                  </Descriptions>
+                ),
+              }}
             />
           </div>
 
@@ -213,6 +262,60 @@ export default function User() {
           }
           .lgc-table .ant-table-tbody > tr:last-child > td {
             border-bottom: 1px solid #d9d9d9 !important;
+          }
+
+          .lgc-segmented {
+            background: #f0f0f0 !important;
+            padding: 4px !important;
+            border-radius: 999px !important;
+          }
+          .lgc-segmented .ant-segmented-item {
+            border-radius: 999px !important;
+            transition: all 0.2s ease;
+          }
+          .lgc-segmented .ant-segmented-item-selected {
+            background: #111 !important;
+            color: #fff !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+          }
+          .lgc-segmented .ant-segmented-item-selected .lgc-seg-count {
+            background: #fff !important;
+            color: #111 !important;
+          }
+          .lgc-seg-option {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 4px;
+            font-weight: 500;
+          }
+          .lgc-seg-count {
+            border-radius: 999px !important;
+            margin: 0 !important;
+            border: none !important;
+            background: #d9d9d9;
+            color: #595959;
+            font-size: 11px;
+            line-height: 16px;
+            padding: 0 7px;
+          }
+
+          .lgc-expand-btn {
+            color: #111 !important;
+            font-size: 18px !important;
+            transition: transform 0.25s ease, color 0.2s ease;
+          }
+          .lgc-expand-btn:hover {
+            color: #595959 !important;
+            transform: scale(1.2);
+          }
+          .lgc-expand-btn.lgc-expand-open {
+            color: #52c41a !important;
+            transform: rotate(180deg);
+          }
+          .lgc-expand-btn.lgc-expand-open:hover {
+            color: #389e0d !important;
+            transform: rotate(180deg) scale(1.2);
           }
         `}</style>
       </Layout>
@@ -269,14 +372,9 @@ export default function User() {
             </Button>
 
             {infoUser.user_rights === 'admin' && (
-              <Button
-                block
-                icon={<SafetyCertificateOutlined />}
-                onClick={() => setShowExtraColumns((v) => !v)}
-                style={{ background: '#111', borderColor: '#111', color: '#fff' }}
-              >
-                {showExtraColumns ? 'Hide System Access' : 'System Access'}
-              </Button>
+              <Text type="secondary" style={{ fontSize: 12, textAlign: 'center', display: 'block' }}>
+                Expand this user's row in the table (via the <SafetyCertificateOutlined /> caret) to view system access details.
+              </Text>
             )}
           </Space>
         </Modal>
