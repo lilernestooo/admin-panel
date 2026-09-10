@@ -11,8 +11,13 @@ export default function Navbar({ title }) {
   const navigate = useNavigate()
   const storedUser = JSON.parse(localStorage.getItem('admin_user') || '{}')
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await logoutUser()
     localStorage.removeItem('admin_user')
+    sessionStorage.removeItem('system_access_user')
+    Object.keys(sessionStorage)
+      .filter((key) => key.startsWith('system_access_unlocked_'))
+      .forEach((key) => sessionStorage.removeItem(key))
     navigate('/login')
   }
 

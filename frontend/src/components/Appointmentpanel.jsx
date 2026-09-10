@@ -85,47 +85,60 @@ export default function AppointmentPanel({ user }) {
     }
   }
 
+  // Centered columns schema configuration
   const columns = [
     {
-      title: 'Date',
+      title: 'DATE',
       dataIndex: 'appointment_date',
       key: 'appointment_date',
-      width: 130,
+      width: 140,
+      align: 'center',
       render: (val) => (val ? dayjs(val).format('MMM D, YYYY') : '—'),
     },
     {
-      title: 'Time',
+      title: 'TIME',
       dataIndex: 'appointment_time',
       key: 'appointment_time',
-      width: 110,
+      width: 130,
+      align: 'center',
       render: (val) => (val ? dayjs(val, 'HH:mm:ss').format('h:mm A') : <Text type="secondary">—</Text>),
     },
-    { title: 'Title', dataIndex: 'title', key: 'title' },
+    { 
+      title: 'TITLE', 
+      dataIndex: 'title', 
+      key: 'title',
+      align: 'center',
+      render: (val) => <div style={{ textAlign: 'center', width: '100%' }}>{val || '—'}</div>
+    },
     {
-      title: 'Notes',
+      title: 'NOTES',
       dataIndex: 'notes',
       key: 'notes',
       ellipsis: true,
-      render: (val) => val || <Text type="secondary">—</Text>,
+      align: 'center',
+      render: (val) => <div style={{ textAlign: 'center', width: '100%' }}>{val || <Text type="secondary">—</Text>}</div>,
     },
     {
-      title: 'Status',
+      title: 'STATUS',
       dataIndex: 'status',
       key: 'status',
-      width: 120,
+      width: 140,
+      align: 'center',
       render: (status) => (
-        <Tag color={STATUS_COLORS[status] || '#8c8c8c'} style={{ borderRadius: 0, margin: 0 }}>
-          {(status || 'scheduled').toUpperCase()}
-        </Tag>
+        <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+          <Tag color={STATUS_COLORS[status] || '#8c8c8c'} style={{ borderRadius: 0, margin: 0 }}>
+            {(status || 'scheduled').toUpperCase()}
+          </Tag>
+        </div>
       ),
     },
     {
-      title: 'Actions',
+      title: 'ACTIONS',
       key: 'actions',
       width: 140,
       align: 'center',
       render: (_, record) => (
-        <Space size="small">
+        <Space size="small" style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
           <Button size="small" icon={<EditOutlined />} onClick={() => openEditModal(record)} />
           <Popconfirm
             title="Delete this appointment?"
@@ -142,15 +155,25 @@ export default function AppointmentPanel({ user }) {
 
   return (
     <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: 8, padding: 20, marginTop: 20 }}>
+      {/* Dynamic inline styles to completely force absolute header center layout */}
+      <style>{`
+        .centered-table .ant-table-thead > tr > th {
+          text-align: center !important;
+        }
+        .centered-table .ant-table-tbody > tr > td {
+          text-align: center !important;
+        }
+      `}</style>
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Space>
           <Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />
           <div>
             <div style={{ fontWeight: 600 }}>
               <CalendarOutlined style={{ marginRight: 6 }} />
-              Appointments — {user.user_name}
+              Appointments — {user?.user_name || 'Guest'}
             </div>
-            <Text type="secondary" style={{ fontSize: 12 }}>{user.userid}</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>{user?.userid || ''}</Text>
           </div>
         </Space>
         <Button
@@ -164,6 +187,7 @@ export default function AppointmentPanel({ user }) {
       </div>
 
       <Table
+        className="centered-table"
         rowKey="appointment_id"
         columns={columns}
         dataSource={appointments}

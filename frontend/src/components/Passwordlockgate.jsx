@@ -13,25 +13,30 @@ export default function PasswordLockGate({ resetKey, persistKey, title = 'System
   const [modalOpen, setModalOpen] = useState(false)
   const [verifying, setVerifying] = useState(false)
   const [form] = Form.useForm()
-  const isFirstRun = useRef(true)
 
-  // Re-lock whenever the target (resetKey) changes — skip the very first run
-  // so a persisted "unlocked" state isn't immediately wiped out on mount
+  // Track the *previous value* of resetKey (not just "have we run once") —
+  // this makes the check idempotent under React 18 Strict Mode, which
+  // deliberately fires mount effects twice in dev. A boolean "first run"
+  // flag gets flipped by the first invocation and then incorrectly treats
+  // the second invocation as "the key changed", wiping out a correctly
+  // restored unlocked state on every reload. Comparing actual values means
+  // running the effect body twice for the same resetKey is a no-op.
+  const prevResetKey = useRef(resetKey)
+
   useEffect(() => {
-    if (isFirstRun.current) {
-      isFirstRun.current = false
-      return
+    if (prevResetKey.current !== resetKey) {
+      setUnlocked(false)
+      prevResetKey.current = resetKey
     }
-    setUnlocked(false)
   }, [resetKey])
 
-// Persist the unlock state (if persistKey given) and tell the parent about it
-    useEffect(() => {
+  // Persist the unlock state (if persistKey given) and tell the parent about it
+  useEffect(() => {
     if (persistKey) {
-        sessionStorage.setItem(persistKey, unlocked ? 'true' : 'false')
+      sessionStorage.setItem(persistKey, unlocked ? 'true' : 'false')
     }
     onUnlockChange?.(unlocked)
-    }, [unlocked])
+  }, [unlocked])
 
   const handleVerify = async (values) => {
     setVerifying(true)
