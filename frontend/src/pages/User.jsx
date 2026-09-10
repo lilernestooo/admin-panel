@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import {
   Layout, Table, Button, Modal, Popconfirm, message, Statistic, Row, Col,
-  Typography, Space, Tag, Avatar, Segmented, Descriptions,
+  Typography, Space, Tag, Avatar, Segmented, Descriptions, Tooltip, Divider,
 } from 'antd'
 import {
   UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined,
   SafetyCertificateOutlined, InfoCircleOutlined, TeamOutlined,
-  PlusCircleFilled, MinusCircleFilled,
+  PlusCircleFilled, MinusCircleFilled, MailOutlined, PhoneOutlined,
 } from '@ant-design/icons'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
@@ -14,7 +14,7 @@ import UserSearchBar from '../components/UserSearchBar'
 import { fetchUsers, deleteUser } from '../api/userApi'
 
 const { Content } = Layout
-const { Text } = Typography
+const { Text, Title } = Typography
 
 export default function User() {
   const [users, setUsers] = useState([])
@@ -114,9 +114,15 @@ export default function User() {
       onHeaderCell: () => ({ className: 'actions-divider' }),
       onCell: () => ({ className: 'actions-divider' }),
       render: (_, record) => (
-        <Button size="small" icon={<InfoCircleOutlined />} onClick={() => setInfoUser(record)}>
-          Info
-        </Button>
+        <Tooltip title="View Info">
+          <Button
+            type="text"
+            shape="circle"
+            icon={<InfoCircleOutlined />}
+            className="lgc-icon-btn"
+            onClick={() => setInfoUser(record)}
+          />
+        </Tooltip>
       ),
     },
   ]
@@ -264,6 +270,10 @@ export default function User() {
             border-bottom: 1px solid #d9d9d9 !important;
           }
 
+          .lgc-table .ant-table-thead > tr > th {
+            white-space: nowrap;
+          }
+
           .lgc-segmented {
             background: #f0f0f0 !important;
             padding: 4px !important;
@@ -317,20 +327,107 @@ export default function User() {
             color: #389e0d !important;
             transform: rotate(180deg) scale(1.2);
           }
+
+          /* Plain icon-only action buttons (table + modal) -- no box, no text */
+          .lgc-icon-btn {
+            color: #595959 !important;
+            font-size: 16px !important;
+            transition: color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+          }
+          .lgc-icon-btn:hover {
+            color: #111 !important;
+            background-color: #f0f0f0 !important;
+            transform: scale(1.1);
+          }
+          .lgc-icon-btn.lgc-icon-danger:hover {
+            color: #fff !important;
+            background-color: #ff4d4f !important;
+          }
+
+          /* Redesigned user info modal */
+          .lgc-info-modal .ant-modal-content {
+            padding: 0;
+            border-radius: 12px;
+            overflow: hidden;
+          }
+          .lgc-info-modal .ant-modal-close {
+            top: 16px;
+            right: 16px;
+            color: #fff;
+          }
+          .lgc-info-modal .ant-modal-close:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.15);
+          }
+          .lgc-info-header {
+            background: #111;
+            padding: 32px 24px 24px;
+            text-align: center;
+            position: relative;
+          }
+          .lgc-info-header .ant-avatar {
+            border: 3px solid rgba(255, 255, 255, 0.15);
+          }
+          .lgc-info-actions {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: flex;
+            gap: 4px;
+          }
+          .lgc-info-actions .lgc-icon-btn {
+            color: rgba(255, 255, 255, 0.75) !important;
+          }
+          .lgc-info-actions .lgc-icon-btn:hover {
+            color: #fff !important;
+            background-color: rgba(255, 255, 255, 0.15) !important;
+          }
+          .lgc-info-actions .lgc-icon-btn.lgc-icon-danger:hover {
+            background-color: #ff4d4f !important;
+            color: #fff !important;
+          }
+          .lgc-info-body {
+            padding: 20px 24px 24px;
+          }
+          .lgc-info-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+          }
+          .lgc-info-row:last-child {
+            border-bottom: none;
+          }
+          .lgc-info-row .anticon {
+            color: #8c8c8c;
+            font-size: 14px;
+          }
         `}</style>
       </Layout>
 
-      {/* User Info popup: view details, edit (new tab), delete, system access */}
+      {/* User Info popup: redesigned header with avatar + icon-only edit/delete actions */}
       {infoUser && (
         <Modal
           open={!!infoUser}
           onCancel={() => setInfoUser(null)}
           footer={null}
           destroyOnClose
-          width={420}
-          title={
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: 24 }}>
-              <span>{infoUser.user_name}</span>
+          width={400}
+          closeIcon={<span style={{ fontSize: 16 }}>✕</span>}
+          className="lgc-info-modal"
+        >
+          <div className="lgc-info-header">
+            <div className="lgc-info-actions">
+              <Tooltip title="Edit">
+                <Button
+                  type="text"
+                  shape="circle"
+                  icon={<EditOutlined />}
+                  className="lgc-icon-btn"
+                  onClick={() => window.open(`/users/edit/${infoUser.rec_id}`, '_blank', 'noopener')}
+                />
+              </Tooltip>
               <Popconfirm
                 title="Delete this user?"
                 description="This action cannot be undone."
@@ -338,45 +435,63 @@ export default function User() {
                 okText="Delete"
                 okButtonProps={{ danger: true }}
               >
-                <Button size="small" danger icon={<DeleteOutlined />} />
+                <Tooltip title="Delete">
+                  <Button
+                    type="text"
+                    shape="circle"
+                    icon={<DeleteOutlined />}
+                    className="lgc-icon-btn lgc-icon-danger"
+                  />
+                </Tooltip>
               </Popconfirm>
             </div>
-          }
-        >
-          <Space direction="vertical" size={8} style={{ width: '100%', marginBottom: 20 }}>
-            <div>
-              <Text type="secondary" style={{ fontSize: 12 }}>User ID</Text>
-              <div style={{ fontWeight: 600 }}>{infoUser.userid}</div>
-            </div>
-            <div>
-              <Text type="secondary" style={{ fontSize: 12 }}>Email</Text>
-              <div>{infoUser.user_email_address || '-'}</div>
-            </div>
-            <div>
-              <Text type="secondary" style={{ fontSize: 12 }}>Mobile</Text>
-              <div>{infoUser.user_mobile_no || '-'}</div>
-            </div>
-            <div>
-              <Text type="secondary" style={{ fontSize: 12 }}>Rights</Text>
+
+            <Avatar size={72} style={{ backgroundColor: '#333' }} icon={<UserOutlined />} />
+            <Title level={5} style={{ color: '#fff', margin: '12px 0 4px' }}>
+              {infoUser.user_name}
+            </Title>
+            <Tag color={infoUser.user_rights === 'admin' ? '#fff' : 'rgba(255,255,255,0.15)'}
+                 style={{
+                   borderRadius: 999, border: 'none', margin: 0,
+                   color: infoUser.user_rights === 'admin' ? '#111' : '#fff',
+                   fontWeight: 600, fontSize: 11, padding: '2px 10px',
+                 }}>
+              {(infoUser.user_rights || 'user').toUpperCase()}
+            </Tag>
+          </div>
+
+          <div className="lgc-info-body">
+            <div className="lgc-info-row">
+              <UserOutlined />
               <div>
-                <Tag color={infoUser.user_rights === 'admin' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0, margin: '4px 0 0' }}>
-                  {(infoUser.user_rights || 'user').toUpperCase()}
-                </Tag>
+                <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>User ID</Text>
+                <Text strong>{infoUser.userid}</Text>
               </div>
             </div>
-          </Space>
-
-          <Space direction="vertical" size={8} style={{ width: '100%' }}>
-            <Button block icon={<EditOutlined />} onClick={() => window.open(`/users/edit/${infoUser.rec_id}`, '_blank', 'noopener')}>
-              Edit User
-            </Button>
+            <div className="lgc-info-row">
+              <MailOutlined />
+              <div>
+                <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>Email</Text>
+                <Text>{infoUser.user_email_address || '-'}</Text>
+              </div>
+            </div>
+            <div className="lgc-info-row">
+              <PhoneOutlined />
+              <div>
+                <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>Mobile</Text>
+                <Text>{infoUser.user_mobile_no || '-'}</Text>
+              </div>
+            </div>
 
             {infoUser.user_rights === 'admin' && (
-              <Text type="secondary" style={{ fontSize: 12, textAlign: 'center', display: 'block' }}>
-                Expand this user's row in the table (via the <SafetyCertificateOutlined /> caret) to view system access details.
-              </Text>
+              <>
+                <Divider style={{ margin: '12px 0' }} />
+                <Text type="secondary" style={{ fontSize: 12, display: 'block', textAlign: 'center' }}>
+                  Expand this user's row in the table to view system access details.
+                </Text>
+              </>
             )}
-          </Space>
+          </div>
         </Modal>
       )}
     </Layout>
