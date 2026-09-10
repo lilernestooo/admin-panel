@@ -10,7 +10,7 @@ import Navbar from '../components/Navbar'
 import { fetchUserById, registerUser, updateUser, verifyPassword } from '../api/userApi'
 
 const { Content } = Layout
-const { Title } = Typography
+const { Title, Text } = Typography
 
 // Tries to close the tab this page was opened in (via window.open). If the
 // browser won't allow that (e.g. the tab was opened by typing the URL
@@ -152,129 +152,195 @@ export default function UserForm() {
     )
   }
 
-  // -- Field list, two per row (same layout as before) ------------------
-  const fields = [
-    <Form.Item key="userid" name="userid" label="User ID" rules={[{ required: true, message: 'User ID is required' }]}>
-      <Input disabled={isEditing} placeholder="e.g. jdoe" />
-    </Form.Item>,
-    <Form.Item key="rights" name="user_rights" label="Access Rights" initialValue="user">
-      <Select
-        options={[
-          { value: 'admin', label: 'Admin' },
-          { value: 'user', label: 'User' },
-        ]}
-        getPopupContainer={(trigger) => trigger.parentNode}
-        popupClassName="lgc-select-dropdown"
-      />
-    </Form.Item>,
-    <Form.Item key="website" name="website_access" label="Website Access" rules={[{ required: true, message: 'Please select a website' }]}>
-      <Select
-        placeholder="Select a website"
-        // TODO: replace with the real list of websites once finalized
-        options={[]}
-        notFoundContent="No websites configured yet"
-        getPopupContainer={(trigger) => trigger.parentNode}
-        popupClassName="lgc-select-dropdown"
-      />
-    </Form.Item>,
-    <Form.Item key="name" name="user_name" label="Full Name" rules={[{ required: true, message: 'Name is required' }]}>
-      <Input placeholder="Juan Dela Cruz" />
-    </Form.Item>,
-    <Form.Item key="empid" name="user_employee_id" label="Employee ID">
-      <Input maxLength={6} placeholder="EMP001" />
-    </Form.Item>,
-    ...(!isEditing
-      ? [
-          <Form.Item key="password" name="user_password" label="Password" rules={[{ required: true, min: 6, message: 'At least 6 characters' }]}>
-            <Input.Password placeholder="Set a password" />
-          </Form.Item>,
-        ]
-      : [
-          <Form.Item
-            key="newpassword"
-            name="new_password"
-            label={
-              <span>
-                New Password{' '}
-                <span
-                  onClick={() => { if (!passwordUnlocked) setVerifyModalOpen(true) }}
-                  className={passwordUnlocked ? 'lock-icon unlocked' : 'lock-icon'}
-                  style={{ cursor: passwordUnlocked ? 'default' : 'pointer', color: passwordUnlocked ? '#52c41a' : '#0a0a0a' }}
-                  title={passwordUnlocked ? 'Password field unlocked' : 'Click to verify your password and unlock'}
-                >
-                  {passwordUnlocked ? <UnlockOutlined /> : <LockOutlined />}
-                </span>
-              </span>
-            }
-            rules={[{ min: 6, message: 'At least 6 characters' }]}
-            extra={passwordUnlocked ? 'Leave blank to keep the current password' : 'Click the lock icon beside the label to enable editing'}
-          >
-            <Input.Password
-              placeholder={passwordUnlocked ? 'Enter a new password to change it' : 'Locked -- verify your password first'}
-              disabled={!passwordUnlocked}
-            />
-          </Form.Item>,
-        ]),
-    <Form.Item key="company" name="companyid" label="Company">
-      <Input placeholder="Company name or ID" />
-    </Form.Item>,
-    <Form.Item key="dealergroup" name="user_dealer_group_code" label="Dealer Group Code">
-      <Input placeholder="e.g. DG-001" />
-    </Form.Item>,
-    <Form.Item key="email" name="user_email_address" label="Email" rules={[{ type: 'email', message: 'Enter a valid email' }]}>
-      <Input placeholder="user@example.com" />
-    </Form.Item>,
-    <Form.Item key="mobile" name="user_mobile_no" label="Mobile Number">
-      <Input placeholder="09171234567" />
-    </Form.Item>,
-    <Form.Item key="calendar" name="calendar_folder" label="Calendar Folder">
-      <Input placeholder="e.g. default_calendar" />
-    </Form.Item>,
-    <Form.Item key="function" name="chFunction" label="Function">
-      <Input placeholder="e.g. System Administrator" />
-    </Form.Item>,
-    <Form.Item key="extnid" name="extn_id" label="Extension ID">
-      <Input placeholder="Extension ID" />
-    </Form.Item>,
-    <Form.Item key="extndial" name="extn_dial_prefix" label="Extension Dial Prefix">
-      <Input placeholder="Dial prefix" />
-    </Form.Item>,
-    <Form.Item key="tgmobile" name="tg_mobile_no" label="TG Mobile No">
-      <Input placeholder="Alternate mobile number" />
-    </Form.Item>,
-  ]
-
-  const fieldRows = []
-  for (let i = 0; i < fields.length; i += 2) {
-    fieldRows.push(
-      <Row gutter={16} key={`row-${i}`}>
-        <Col span={12}>{fields[i]}</Col>
-        {fields[i + 1] && <Col span={12}>{fields[i + 1]}</Col>}
-      </Row>
-    )
-  }
+  // -- Section header helper ---------------------------------------------
+  const SectionHeader = ({ title, subtitle }) => (
+    <div style={{ marginBottom: 20 }}>
+      <Title level={5} style={{ margin: 0, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+        {title}
+      </Title>
+      {subtitle && (
+        <Text type="secondary" style={{ fontSize: 13 }}>
+          {subtitle}
+        </Text>
+      )}
+    </div>
+  )
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
       <Layout>
         <Navbar title={isEditing ? 'EDIT USER' : 'REGISTER NEW USER'} />
-        <Content style={{ margin: '32px auto', maxWidth: 760, width: '100%', padding: '0 24px' }}>
+        <Content style={{ margin: '32px auto', maxWidth: 920, width: '100%', padding: '0 24px 48px' }}>
           <Spin spinning={submitting} tip={isEditing ? 'Saving changes...' : 'Registering user...'}>
-            <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: 8, padding: 32 }}>
-              <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                {fieldRows}
+            <Form form={form} layout="vertical" size="large" onFinish={handleSubmit}>
 
-                <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
-                  <Button style={{ marginRight: 8 }} onClick={() => closeOrRedirect(navigate)}>
-                    Cancel
-                  </Button>
-                  <Button type="primary" htmlType="submit" loading={submitting} style={{ background: '#111', borderColor: '#111' }}>
-                    Submit
-                  </Button>
-                </Form.Item>
-              </Form>
-            </div>
+              {/* -- Account section --------------------------------------- */}
+              <div className="lgc-section">
+                <SectionHeader title="Account" subtitle="Login credentials and access level" />
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item name="userid" label="User ID" rules={[{ required: true, message: 'User ID is required' }]}>
+                      <Input disabled={isEditing} placeholder="e.g. jdoe" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="user_rights" label="Access Rights" initialValue="user">
+                      <Select
+                        options={[
+                          { value: 'admin', label: 'Admin' },
+                          { value: 'user', label: 'User' },
+                        ]}
+                        getPopupContainer={(trigger) => trigger.parentNode}
+                        popupClassName="lgc-select-dropdown"
+                      />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item name="website_access" label="Website Access" rules={[{ required: true, message: 'Please select a website' }]}>
+                      <Select
+                        placeholder="Select a website"
+                        // TODO: replace with the real list of websites once finalized
+                        options={[]}
+                        notFoundContent="No websites configured yet"
+                        getPopupContainer={(trigger) => trigger.parentNode}
+                        popupClassName="lgc-select-dropdown"
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    {!isEditing ? (
+                      <Form.Item name="user_password" label="Password" rules={[{ required: true, min: 6, message: 'At least 6 characters' }]}>
+                        <Input.Password placeholder="Set a password" />
+                      </Form.Item>
+                    ) : (
+                      <Form.Item
+                        name="new_password"
+                        label={
+                          <span>
+                            New Password{' '}
+                            <span
+                              onClick={() => { if (!passwordUnlocked) setVerifyModalOpen(true) }}
+                              className={passwordUnlocked ? 'lock-icon unlocked' : 'lock-icon'}
+                              style={{ cursor: passwordUnlocked ? 'default' : 'pointer', color: passwordUnlocked ? '#52c41a' : '#0a0a0a' }}
+                              title={passwordUnlocked ? 'Password field unlocked' : 'Click to verify your password and unlock'}
+                            >
+                              {passwordUnlocked ? <UnlockOutlined /> : <LockOutlined />}
+                            </span>
+                          </span>
+                        }
+                        rules={[{ min: 6, message: 'At least 6 characters' }]}
+                        extra={passwordUnlocked ? 'Leave blank to keep the current password' : 'Click the lock icon beside the label to enable editing'}
+                      >
+                        <Input.Password
+                          placeholder={passwordUnlocked ? 'Enter a new password to change it' : 'Locked -- verify your password first'}
+                          disabled={!passwordUnlocked}
+                        />
+                      </Form.Item>
+                    )}
+                  </Col>
+                </Row>
+              </div>
+
+              <Divider className="lgc-section-divider" />
+
+              {/* -- Personal details section -------------------------------- */}
+              <div className="lgc-section">
+                <SectionHeader title="Personal Details" subtitle="Who this user is" />
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item name="user_name" label="Full Name" rules={[{ required: true, message: 'Name is required' }]}>
+                      <Input placeholder="Juan Dela Cruz" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="user_employee_id" label="Employee ID">
+                      <Input maxLength={6} placeholder="EMP001" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item name="user_email_address" label="Email" rules={[{ type: 'email', message: 'Enter a valid email' }]}>
+                      <Input placeholder="user@example.com" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="user_mobile_no" label="Mobile Number">
+                      <Input placeholder="09171234567" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+
+              <Divider className="lgc-section-divider" />
+
+              {/* -- Organization section -------------------------------------- */}
+              <div className="lgc-section">
+                <SectionHeader title="Organization" subtitle="Company and dealer information" />
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item name="companyid" label="Company">
+                      <Input placeholder="Company name or ID" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="user_dealer_group_code" label="Dealer Group Code">
+                      <Input placeholder="e.g. DG-001" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item name="chFunction" label="Function">
+                      <Input placeholder="e.g. System Administrator" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="calendar_folder" label="Calendar Folder">
+                      <Input placeholder="e.g. default_calendar" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+
+              <Divider className="lgc-section-divider" />
+
+              {/* -- Extension / system section -------------------------------- */}
+              <div className="lgc-section">
+                <SectionHeader title="Extension Details" subtitle="Phone and system extension settings" />
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item name="extn_id" label="Extension ID">
+                      <Input placeholder="Extension ID" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item name="extn_dial_prefix" label="Extension Dial Prefix">
+                      <Input placeholder="Dial prefix" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row gutter={24}>
+                  <Col span={12}>
+                    <Form.Item name="tg_mobile_no" label="TG Mobile No">
+                      <Input placeholder="Alternate mobile number" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+
+              <Form.Item style={{ marginTop: 32, marginBottom: 0, textAlign: 'right' }}>
+                <Button size="large" style={{ marginRight: 8 }} onClick={() => closeOrRedirect(navigate)}>
+                  Cancel
+                </Button>
+                <Button size="large" type="primary" htmlType="submit" loading={submitting} style={{ background: '#111', borderColor: '#111' }}>
+                  Submit
+                </Button>
+              </Form.Item>
+            </Form>
           </Spin>
         </Content>
 
@@ -342,6 +408,30 @@ export default function UserForm() {
           }
           .ant-modal-title {
             text-transform: uppercase;
+          }
+
+          .lgc-section {
+            background: #fff;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            padding: 28px 32px;
+          }
+          .lgc-section-divider {
+            margin: 28px 0;
+            border-color: transparent;
+          }
+          .lgc-section .ant-form-item {
+            margin-bottom: 22px;
+          }
+          .lgc-section .ant-input,
+          .lgc-section .ant-input-password,
+          .lgc-section .ant-select-selector {
+            font-size: 15px;
+          }
+          .lgc-section .ant-select-selector,
+          .lgc-section .ant-input-affix-wrapper,
+          .lgc-section input.ant-input {
+            min-height: 44px !important;
           }
         `}</style>
       </Layout>
