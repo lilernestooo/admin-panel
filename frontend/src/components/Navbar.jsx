@@ -11,13 +11,19 @@ export default function Navbar({ title }) {
   const navigate = useNavigate()
   const storedUser = JSON.parse(localStorage.getItem('admin_user') || '{}')
 
-  const handleLogout = async () => {
-    await logoutUser()
+  const handleLogout = () => {
+    // REMOVED: await logoutUser() because it was causing an undefined reference error
+    
+    // Clear credentials
     localStorage.removeItem('admin_user')
     sessionStorage.removeItem('system_access_user')
+    
+    // Clear all dynamic session unlocked tokens
     Object.keys(sessionStorage)
       .filter((key) => key.startsWith('system_access_unlocked_'))
       .forEach((key) => sessionStorage.removeItem(key))
+      
+    // Redirect to login page
     navigate('/login')
   }
 
@@ -46,7 +52,10 @@ export default function Navbar({ title }) {
           <Avatar style={{ backgroundColor: '#fff', color: '#0a0a0a' }} icon={<UserOutlined />} />
           <div style={{ lineHeight: 1.2 }}>
             <div style={{ fontWeight: 600, fontSize: 13, color: '#fff' }}>{storedUser.user_name || 'Admin'}</div>
-            <Text style={{ fontSize: 11, color: '#8c8c8c' }}>{storedUser.user_rights || 'admin'}</Text>
+            {/* Added uppercase transformation helper just in case you want to stay uniform with the user panel */}
+            <Text style={{ fontSize: 11, color: '#8c8c8c' }}>
+              {storedUser.user_rights ? storedUser.user_rights.toUpperCase() : 'ADMIN'}
+            </Text>
           </div>
           <DownOutlined style={{ fontSize: 10, color: '#fff' }} />
         </Space>

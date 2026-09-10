@@ -167,13 +167,13 @@ export default function AppointmentPanel({ user }) {
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Space>
-          <Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />
+          {/*<Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />*/}
           <div>
             <div style={{ fontWeight: 600 }}>
               <CalendarOutlined style={{ marginRight: 6 }} />
-              Appointments — {user?.user_name || 'Guest'}
+              APPOINTMENTS 
             </div>
-            <Text type="secondary" style={{ fontSize: 12 }}>{user?.userid || ''}</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>{user?.userid ? user.userid.toUpperCase() : ''}</Text>
           </div>
         </Space>
         <Button

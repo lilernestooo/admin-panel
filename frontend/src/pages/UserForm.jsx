@@ -1,0 +1,315 @@
+import React, { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import {
+  Layout, Form, Input, Select, Button, Modal, Divider, Spin,
+  Typography, Row, Col, message,
+} from 'antd'
+import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
+import Sidebar from '../components/Sidebar'
+import Navbar from '../components/Navbar'
+import { fetchUserById, registerUser, updateUser, verifyPassword } from '../api/userApi'
+
+const { Content } = Layout
+const { Title } = Typography
+
+// Tries to close the tab this page was opened in (via window.open). If the
+// browser won't allow that (e.g. the tab was opened by typing the URL
+// directly, not by script), fall back to sending the user to the main list.
+function closeOrRedirect(navigate) {
+  window.close()
+  setTimeout(() => {
+    if (!window.closed) navigate('/')
+  }, 150)
+}
+
+export default function UserForm() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const isEditing = !!id
+
+  const [form] = Form.useForm()
+  const [verifyForm] = Form.useForm()
+
+  const [loadingUser, setLoadingUser] = useState(isEditing)
+  const [notFound, setNotFound] = useState(false)
+  const [editingUser, setEditingUser] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  const [passwordUnlocked, setPasswordUnlocked] = useState(false)
+  const [verifyModalOpen, setVerifyModalOpen] = useState(false)
+  const [verifying, setVerifying] = useState(false)
+
+  // -- Load the existing user when editing ----------------------------
+  useEffect(() => {
+    if (!isEditing) return
+    let cancelled = false
+
+    setLoadingUser(true)
+    fetchUserById(id).then((res) => {
+      if (cancelled) return
+      if (res.success) {
+        setEditingUser(res.data)
+        form.setFieldsValue(res.data)
+      } else {
+        setNotFound(true)
+        message.error(res.message || 'User not found')
+      }
+      setLoadingUser(false)
+    })
+
+    return () => { cancelled = true }
+  }, [id, isEditing, form])
+
+  // -- Verify-password-to-unlock-new-password-field flow ---------------
+  const handleVerifyPassword = async (values) => {
+    setVerifying(true)
+    const storedAdmin = JSON.parse(localStorage.getItem('admin_user') || '{}')
+    const res = await verifyPassword({ userid: storedAdmin.userid, password: values.confirm_password })
+    setVerifying(false)
+
+    if (res.success) {
+      setPasswordUnlocked(true)
+      setVerifyModalOpen(false)
+      verifyForm.resetFields()
+      message.success('Password field unlocked')
+    } else {
+      message.error(res.message || 'Incorrect password')
+    }
+  }
+
+  // -- Submit ------------------------------------------------------------
+  const handleSubmit = async (values) => {
+    setSubmitting(true)
+    const res = isEditing
+      ? await updateUser({ ...values, rec_id: editingUser.rec_id })
+      : await registerUser(values)
+    setSubmitting(false)
+
+    if (!res.success) {
+      message.error(res.message || 'Something went wrong')
+      return
+    }
+
+    if (isEditing && res.password_changed) {
+      Modal.success({
+        title: 'Password Changed Successfully',
+        content: 'The password has been updated. You will now be logged out -- please log back in using the new password to confirm it works.',
+        okText: 'Log Out Now',
+        okButtonProps: { style: { background: '#111', borderColor: '#111' } },
+        onOk: () => {
+          localStorage.removeItem('admin_user')
+          navigate('/login')
+        },
+      })
+      return
+    }
+
+    Modal.success({
+      title: isEditing ? 'User Updated Successfully' : 'User Registered Successfully',
+      content: isEditing
+        ? 'The changes have been saved.'
+        : 'The new user has been added to the system.',
+      okText: 'Close',
+      okButtonProps: { style: { background: '#111', borderColor: '#111' } },
+      onOk: () => closeOrRedirect(navigate),
+    })
+  }
+
+  if (loadingUser) {
+    return (
+      <Layout style={{ minHeight: '100vh' }}>
+        <Sidebar />
+        <Layout>
+          <Navbar title="EDIT USER" />
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 64px)' }}>
+            <Spin size="large" />
+          </div>
+        </Layout>
+      </Layout>
+    )
+  }
+
+  if (notFound) {
+    return (
+      <Layout style={{ minHeight: '100vh' }}>
+        <Sidebar />
+        <Layout>
+          <Navbar title="EDIT USER" />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 'calc(100vh - 64px)', gap: 16 }}>
+            <Title level={4}>User not found</Title>
+            <Button onClick={() => closeOrRedirect(navigate)}>Close</Button>
+          </div>
+        </Layout>
+      </Layout>
+    )
+  }
+
+  // -- Field list, two per row (same layout as before) ------------------
+  const fields = [
+    <Form.Item key="userid" name="userid" label="User ID" rules={[{ required: true, message: 'User ID is required' }]}>
+      <Input disabled={isEditing} placeholder="e.g. jdoe" />
+    </Form.Item>,
+    <Form.Item key="rights" name="user_rights" label="Access Rights" initialValue="user">
+      <Select
+        options={[
+          { value: 'admin', label: 'Admin' },
+          { value: 'user', label: 'User' },
+        ]}
+        getPopupContainer={(trigger) => trigger.parentNode}
+        popupClassName="lgc-select-dropdown"
+      />
+    </Form.Item>,
+    <Form.Item key="name" name="user_name" label="Full Name" rules={[{ required: true, message: 'Name is required' }]}>
+      <Input placeholder="Juan Dela Cruz" />
+    </Form.Item>,
+    <Form.Item key="empid" name="user_employee_id" label="Employee ID">
+      <Input maxLength={6} placeholder="EMP001" />
+    </Form.Item>,
+    ...(!isEditing
+      ? [
+          <Form.Item key="password" name="user_password" label="Password" rules={[{ required: true, min: 6, message: 'At least 6 characters' }]}>
+            <Input.Password placeholder="Set a password" />
+          </Form.Item>,
+        ]
+      : [
+          <Form.Item
+            key="newpassword"
+            name="new_password"
+            label={
+              <span>
+                New Password{' '}
+                <span
+                  onClick={() => { if (!passwordUnlocked) setVerifyModalOpen(true) }}
+                  className={passwordUnlocked ? 'lock-icon unlocked' : 'lock-icon'}
+                  style={{ cursor: passwordUnlocked ? 'default' : 'pointer', color: passwordUnlocked ? '#52c41a' : '#0a0a0a' }}
+                  title={passwordUnlocked ? 'Password field unlocked' : 'Click to verify your password and unlock'}
+                >
+                  {passwordUnlocked ? <UnlockOutlined /> : <LockOutlined />}
+                </span>
+              </span>
+            }
+            rules={[{ min: 6, message: 'At least 6 characters' }]}
+            extra={passwordUnlocked ? 'Leave blank to keep the current password' : 'Click the lock icon beside the label to enable editing'}
+          >
+            <Input.Password
+              placeholder={passwordUnlocked ? 'Enter a new password to change it' : 'Locked -- verify your password first'}
+              disabled={!passwordUnlocked}
+            />
+          </Form.Item>,
+        ]),
+    <Form.Item key="company" name="companyid" label="Company">
+      <Input placeholder="Company name or ID" />
+    </Form.Item>,
+    <Form.Item key="dealergroup" name="user_dealer_group_code" label="Dealer Group Code">
+      <Input placeholder="e.g. DG-001" />
+    </Form.Item>,
+    <Form.Item key="email" name="user_email_address" label="Email" rules={[{ type: 'email', message: 'Enter a valid email' }]}>
+      <Input placeholder="user@example.com" />
+    </Form.Item>,
+    <Form.Item key="mobile" name="user_mobile_no" label="Mobile Number">
+      <Input placeholder="09171234567" />
+    </Form.Item>,
+    <Form.Item key="calendar" name="calendar_folder" label="Calendar Folder">
+      <Input placeholder="e.g. default_calendar" />
+    </Form.Item>,
+    <Form.Item key="function" name="chFunction" label="Function">
+      <Input placeholder="e.g. System Administrator" />
+    </Form.Item>,
+    <Form.Item key="extnid" name="extn_id" label="Extension ID">
+      <Input placeholder="Extension ID" />
+    </Form.Item>,
+    <Form.Item key="extndial" name="extn_dial_prefix" label="Extension Dial Prefix">
+      <Input placeholder="Dial prefix" />
+    </Form.Item>,
+    <Form.Item key="tgmobile" name="tg_mobile_no" label="TG Mobile No">
+      <Input placeholder="Alternate mobile number" />
+    </Form.Item>,
+  ]
+
+  const fieldRows = []
+  for (let i = 0; i < fields.length; i += 2) {
+    fieldRows.push(
+      <Row gutter={16} key={`row-${i}`}>
+        <Col span={12}>{fields[i]}</Col>
+        {fields[i + 1] && <Col span={12}>{fields[i + 1]}</Col>}
+      </Row>
+    )
+  }
+
+  return (
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sidebar />
+      <Layout>
+        <Navbar title={isEditing ? 'EDIT USER' : 'REGISTER NEW USER'} />
+        <Content style={{ margin: '32px auto', maxWidth: 760, width: '100%', padding: '0 24px' }}>
+          <Spin spinning={submitting} tip={isEditing ? 'Saving changes...' : 'Registering user...'}>
+            <div style={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: 8, padding: 32 }}>
+              <Form form={form} layout="vertical" onFinish={handleSubmit}>
+                {fieldRows}
+
+                <Form.Item style={{ marginTop: 24, marginBottom: 0, textAlign: 'right' }}>
+                  <Button style={{ marginRight: 8 }} onClick={() => closeOrRedirect(navigate)}>
+                    Cancel
+                  </Button>
+                  <Button type="primary" htmlType="submit" loading={submitting} style={{ background: '#111', borderColor: '#111' }}>
+                    Submit
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
+          </Spin>
+        </Content>
+
+        {/* Confirm-your-password modal, used to unlock the New Password field */}
+        <Modal
+          title="Confirm Your Password"
+          open={verifyModalOpen}
+          onCancel={() => { setVerifyModalOpen(false); verifyForm.resetFields() }}
+          footer={null}
+          destroyOnClose
+          maskClosable={false}
+          keyboard={false}
+        >
+          <Divider style={{ marginTop: 0, marginBottom: 20 }} />
+          <p style={{ color: '#595959', marginBottom: 16 }}>
+            For security, enter your own account password to unlock the New Password field.
+          </p>
+          <Form form={verifyForm} layout="vertical" onFinish={handleVerifyPassword}>
+            <Form.Item name="confirm_password" label="Your Account Password" rules={[{ required: true, message: 'Password is required' }]}>
+              <Input.Password placeholder="Enter your password" autoFocus />
+            </Form.Item>
+            <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
+              <Button type="primary" htmlType="submit" loading={verifying} style={{ background: '#111', borderColor: '#111' }}>
+                Verify
+              </Button>
+            </Form.Item>
+          </Form>
+        </Modal>
+
+        <style>{`
+          .lock-icon {
+            display: inline-flex;
+            padding: 2px 4px;
+            border-radius: 4px;
+            transition: background-color 0.15s ease, transform 0.15s ease;
+          }
+          .lock-icon:not(.unlocked):hover {
+            background-color: #f0f0f0;
+            transform: scale(1.15);
+          }
+          .lock-icon.unlocked {
+            cursor: default;
+          }
+          .lgc-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+            background-color: #b4adad !important;
+            color: #0a0a0a !important;
+            font-weight: 600;
+          }
+          .lgc-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+            background-color: #b4adad !important;
+          }
+        `}</style>
+      </Layout>
+    </Layout>
+  )
+}

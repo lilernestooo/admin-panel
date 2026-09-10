@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Login from './pages/Login'
 import User from './pages/User'
+import UserForm from './pages/UserForm'
 import Dashboard from './pages/Dashboard'
 import AuditLog from './pages/AuditLog'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -18,6 +19,22 @@ export default function App() {
           element={
             <ProtectedRoute allowedRoles={['admin']}>
               <User />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users/new"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <UserForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users/edit/:id"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <UserForm />
             </ProtectedRoute>
           }
         />

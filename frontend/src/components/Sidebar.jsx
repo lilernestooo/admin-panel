@@ -89,7 +89,7 @@ export default function Sidebar() {
             children: [
               { key: 'users', icon: <TeamOutlined />, label: 'Users' },
               { key: 'dealers', icon: <ShopOutlined />, label: 'Dealers' },
-              { key: 'company', icon: <ApartmentOutlined />, label: 'Company' },
+              { key: 'email recipient', icon: <ApartmentOutlined />, label: 'Email Recipient' },
             ],
           },
           { key: 'audit-log', icon: <FileSearchOutlined />, label: 'Audit Log' },

@@ -11,6 +11,21 @@ export async function fetchUsers() {
   return res.json()
 }
 
+// Used by the standalone Edit User tab, which only has a rec_id from the
+// URL and needs that one user's data. There's no dedicated single-user
+// endpoint on the backend, so we reuse list.php and pick the record out
+// client-side. If this list ever gets large, swap this for a real
+// "get_one.php?rec_id=" endpoint instead.
+export async function fetchUserById(rec_id) {
+  const res = await fetchUsers()
+  if (!res.success) return res
+
+  const user = res.data.find((u) => String(u.rec_id) === String(rec_id))
+  return user
+    ? { success: true, data: user }
+    : { success: false, message: 'User not found' }
+}
+
 export async function registerUser(payload) {
   const res = await fetch(`${BASE_URL}/register.php`, {
     method: 'POST',
