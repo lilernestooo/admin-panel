@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import {
   Layout, Card, Row, Col, Statistic, Typography, Progress,
-  List, Avatar, Tag, Space, Button, message, Badge
+  List, Avatar, Tag, Space, Button, message, Badge, Tooltip as AntTooltip
 } from 'antd'
 import {
   TeamOutlined, UserOutlined, SafetyCertificateOutlined,
-  ClockCircleOutlined, PlusOutlined, RiseOutlined
+  ClockCircleOutlined, PlusOutlined, RiseOutlined, ReloadOutlined
 } from '@ant-design/icons'
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
@@ -40,6 +40,19 @@ const loadUsers = async (isBackgroundRefresh = false) => {
 
   useEffect(() => { loadUsers() }, [])
 
+  // Auto-refresh immediately when switching back to the dashboard tab
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') loadUsers(true)
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    window.addEventListener('focus', () => loadUsers(true))
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      window.removeEventListener('focus', () => loadUsers(true))
+    }
+  }, [])
+
 // Re-evaluate "active" status every 60s so the indicator updates as time passes,
 // even without new data (e.g. someone crossing the 24h threshold)
 useEffect(() => {
@@ -49,11 +62,11 @@ useEffect(() => {
   return () => clearInterval(tickInterval)
 }, [])
 
-// Silently refetch user data every 30s to catch new logins from other users
+// Silently refetch user data every 10s to catch new logins and signups in real-time
 useEffect(() => {
   const pollInterval = setInterval(() => {
     loadUsers(true)
-  }, 30 * 1000)
+  }, 10 * 1000)
   return () => clearInterval(pollInterval)
 }, [])
 
@@ -83,33 +96,50 @@ const recentUsers = [...users]
 
       // ── Build cumulative signup growth data for the chart ──────
       const growthData = (() => {
+        // Helper to format a Date into local YYYY-MM-DD string
+        const toLocalDateKey = (d) => {
+          const year = d.getFullYear()
+          const month = String(d.getMonth() + 1).padStart(2, '0')
+          const day = String(d.getDate()).padStart(2, '0')
+          return `${year}-${month}-${day}`
+        }
+
         const withDates = users
           .filter(u => u.created_at)
-          .map(u => new Date(u.created_at))
+          .map(u => {
+            const dateStr = typeof u.created_at === 'string' ? u.created_at.replace(' ', 'T') : u.created_at
+            return new Date(dateStr)
+          })
+          .filter(d => !isNaN(d.getTime()))
           .sort((a, b) => a - b)
 
         if (withDates.length === 0) return []
 
-        // Count signups per calendar day (using a sortable YYYY-MM-DD key)
+        // Count signups per calendar day using LOCAL date strings (avoids UTC offset shifts)
         const countsByDay = {}
         withDates.forEach(date => {
-          const dayKey = date.toISOString().split('T')[0] // e.g. "2026-09-03"
+          const dayKey = toLocalDateKey(date)
           countsByDay[dayKey] = (countsByDay[dayKey] || 0) + 1
         })
 
-        // Walk every calendar day from the first signup to today,
-        // carrying the running total forward on days with no new signups
+        // Walk every calendar day in local time from first signup to today
         const firstDay = new Date(withDates[0])
         firstDay.setHours(0, 0, 0, 0)
         const today = new Date()
         today.setHours(0, 0, 0, 0)
 
+        // If all signups happened today, prepend yesterday with 0 so the AreaChart can draw an area slope
+        const startDay = new Date(firstDay)
+        if (firstDay.getTime() === today.getTime()) {
+          startDay.setDate(startDay.getDate() - 1)
+        }
+
         const data = []
         let running = 0
-        const cursor = new Date(firstDay)
+        const cursor = new Date(startDay)
 
         while (cursor <= today) {
-          const dayKey = cursor.toISOString().split('T')[0]
+          const dayKey = toLocalDateKey(cursor)
           running += countsByDay[dayKey] || 0
           data.push({
             date: cursor.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -265,8 +295,21 @@ const getStatCardStyle = (key) => ({
           <Row gutter={16} style={{ marginBottom: 24 }}>
             <Col span={16}>
             <Card
-            title="USER GROWTH"
-            extra={<Text type="secondary" style={{ fontSize: 12 }}>CUMULATIVE SIGNUPS OVER TIME</Text>}
+              title="USER GROWTH"
+              extra={
+                <Space size={12}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>CUMULATIVE SIGNUPS OVER TIME</Text>
+                  <AntTooltip title="Refresh chart">
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={<ReloadOutlined spin={loading} />}
+                      onClick={() => loadUsers(false)}
+                      style={{ color: '#595959' }}
+                    />
+                  </AntTooltip>
+                </Space>
+              }
               style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
               headStyle={{ fontWeight: 600 }}
             >

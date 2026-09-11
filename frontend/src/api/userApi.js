@@ -7,7 +7,7 @@ function getRequesterId() {
 
 export async function fetchUsers() {
   const requesterId = getRequesterId()
-  const res = await fetch(`${BASE_URL}/list.php?requester_id=${encodeURIComponent(requesterId)}`)
+  const res = await fetch(`${BASE_URL}/list.php?requester_id=${encodeURIComponent(requesterId)}&_t=${Date.now()}`)
   return res.json()
 }
 
