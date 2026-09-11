@@ -216,11 +216,11 @@ export default function UserForm() {
                   </Col>
                 </Row>
                 <Row gutter={24}>
+                  {/* TODO: Website Access field — commented out until the website list is finalized
                   <Col span={12}>
                     <Form.Item name="website_access" label="Website Access" rules={[{ required: true, message: 'Please select a website' }]}>
                       <Select
                         placeholder="Select a website"
-                        // TODO: replace with the real list of websites once finalized
                         options={[]}
                         notFoundContent="No websites configured yet"
                         getPopupContainer={(trigger) => trigger.parentNode}
@@ -228,6 +228,7 @@ export default function UserForm() {
                       />
                     </Form.Item>
                   </Col>
+                  */}
                   <Col span={12}>
                     {!isEditing ? (
                       <Form.Item name="user_password" label="Password" rules={[{ required: true, min: 6, message: 'At least 6 characters' }]}>
