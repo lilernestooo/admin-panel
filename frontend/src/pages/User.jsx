@@ -208,19 +208,20 @@ export default function User() {
               sticky
               bordered
               className="lgc-table"
-              expandable={{
-                rowExpandable: (record) => record.user_rights === 'admin',
-                expandIcon: ({ expanded, onExpand, record, expandable }) =>
-                  expandable ? (
-                    <Button
-                      type="text"
-                      shape="circle"
-                      size="small"
-                      onClick={(e) => onExpand(record, e)}
-                      icon={expanded ? <MinusCircleFilled /> : <PlusCircleFilled />}
-                      className={`lgc-expand-btn ${expanded ? 'lgc-expand-open' : ''}`}
-                    />
-                  ) : null,
+                expandable={{
+                  columnTitle: '+/-',
+                  rowExpandable: (record) => record.user_rights === 'admin',
+                  expandIcon: ({ expanded, onExpand, record, expandable }) =>
+                    expandable ? (
+                      <Button
+                        type="text"
+                        shape="circle"
+                        size="small"
+                        onClick={(e) => onExpand(record, e)}
+                        icon={expanded ? <MinusCircleFilled /> : <PlusCircleFilled />}
+                        className={`lgc-expand-btn ${expanded ? 'lgc-expand-open' : ''}`}
+                      />
+                    ) : null,
                 expandedRowRender: (record) => (
                   <Descriptions size="small" column={3} bordered style={{ margin: '4px 0' }}>
                     <Descriptions.Item label="TG Mobile No">{record.tg_mobile_no || '-'}</Descriptions.Item>
