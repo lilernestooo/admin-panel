@@ -1,14 +1,9 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../config/auth.php';
+require_once __DIR__ . '/../../middleware/bootstrap.php';
 require_once __DIR__ . '/../../config/audit.php';
 
-$database = new Database();
-$pdo = $database->connect();
-
-$data = json_decode(file_get_contents("php://input"), true);
-
-requireAdmin($pdo, $data);
+requireAdmin($pdo);
+$requesterUserid = $_SESSION['userid'];
 
 if (empty($data['rec_id'])) {
     http_response_code(400);
@@ -72,7 +67,7 @@ try {
     logAudit(
         $pdo,
         $passwordChanged ? 'UPDATE (password changed)' : 'UPDATE',
-        $data['requester_id'],
+        $requesterUserid,
         $existingUser['userid'] ?? null,
         $data['user_name'] ?? null
     );

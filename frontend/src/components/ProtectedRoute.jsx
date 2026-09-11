@@ -2,6 +2,14 @@ import React from 'react'
 import { Navigate } from 'react-router-dom'
 import { message } from 'antd'
 import { isSessionExpired, clearSession } from '../utils/session'
+import { logoutUser } from '../api/userApi'
+
+// Best-effort: tell the backend to destroy the real session too, not just
+// the local display copy. Fire-and-forget so it never blocks the redirect.
+function endSessionEverywhere() {
+  logoutUser().catch(() => {})
+  clearSession()
+}
 
 export default function ProtectedRoute({ children, allowedRoles }) {
   const storedUser = localStorage.getItem('admin_user')
@@ -11,7 +19,7 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   }
 
   if (isSessionExpired()) {
-    clearSession()
+    endSessionEverywhere()
     message.warning('Your session has expired. Please log in again.')
     return <Navigate to="/login" replace />
   }
@@ -20,14 +28,15 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   try {
     user = JSON.parse(storedUser)
   } catch (err) {
-    clearSession()
+    endSessionEverywhere()
     return <Navigate to="/login" replace />
   }
 
   if (allowedRoles && !allowedRoles.includes(user.user_rights)) {
-    clearSession()
+    // Wrong role for THIS route -- the session itself may still be valid,
+    // so don't log them out. Just refuse this page.
     message.error('You do not have permission to access this page')
-    return <Navigate to="/login" replace />
+    return <Navigate to="/dashboard" replace />
   }
 
   return children

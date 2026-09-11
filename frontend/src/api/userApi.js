@@ -1,14 +1,47 @@
 const BASE_URL = 'http://localhost/admin-dashboard/backend/api/users'
 
-function getRequesterId() {
-  const storedUser = JSON.parse(localStorage.getItem('admin_user') || '{}')
-  return storedUser.userid || null
+// requester_id is gone -- the backend now identifies the caller via the
+// session cookie, not anything the client sends. Every request below needs
+// credentials: 'include' so that cookie actually gets attached.
+
+// Shared safe-fetch wrapper. Guarantees every caller gets back a plain
+// { success, message } shaped object -- never a thrown exception -- even if
+// the network fails or the response body isn't valid JSON (e.g. a PHP
+// fatal error printed as HTML instead of the expected JSON). This is what
+// was causing forms to hang forever: res.json() throwing with nothing to
+// catch it meant loading states never got reset.
+async function apiRequest(url, options = {}) {
+  let res
+  try {
+    res = await fetch(url, options)
+  } catch (err) {
+    return { success: false, message: 'Could not reach the backend. Is the server running?' }
+  }
+
+  let body
+  try {
+    body = await res.json()
+  } catch (err) {
+    return {
+      success: false,
+      message: res.status === 401
+        ? 'Your session has expired. Please log in again.'
+        : `Unexpected server response (status ${res.status}).`,
+    }
+  }
+
+  // Handle expired/invalid sessions consistently in one place.
+  if (res.status === 401) {
+    return { success: false, message: body.message || 'Your session has expired. Please log in again.', sessionExpired: true }
+  }
+
+  return body
 }
 
 export async function fetchUsers() {
-  const requesterId = getRequesterId()
-  const res = await fetch(`${BASE_URL}/list.php?requester_id=${encodeURIComponent(requesterId)}&_t=${Date.now()}`)
-  return res.json()
+  return apiRequest(`${BASE_URL}/list.php?_t=${Date.now()}`, {
+    credentials: 'include',
+  })
 }
 
 // Used by the standalone Edit User tab, which only has a rec_id from the
@@ -27,52 +60,61 @@ export async function fetchUserById(rec_id) {
 }
 
 export async function registerUser(payload) {
-  const res = await fetch(`${BASE_URL}/register.php`, {
+  return apiRequest(`${BASE_URL}/register.php`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...payload, requester_id: getRequesterId() }),
+    body: JSON.stringify(payload),
   })
-  return res.json()
 }
 
 export async function updateUser(payload) {
-  const res = await fetch(`${BASE_URL}/update.php`, {
+  return apiRequest(`${BASE_URL}/update.php`, {
     method: 'PUT',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ...payload, requester_id: getRequesterId() }),
+    body: JSON.stringify(payload),
   })
-  return res.json()
 }
 
 export async function deleteUser(rec_id) {
-  const res = await fetch(`${BASE_URL}/delete.php`, {
+  return apiRequest(`${BASE_URL}/delete.php`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ rec_id, requester_id: getRequesterId() }),
+    body: JSON.stringify({ rec_id }),
   })
-  return res.json()
 }
 
 export async function loginUser(payload) {
-  const res = await fetch(`${BASE_URL}/login.php`, {
+  return apiRequest(`${BASE_URL}/login.php`, {
     method: 'POST',
+    credentials: 'include', // lets the browser store the session cookie the backend sets
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
-  return res.json()
+}
+
+export async function logoutUser() {
+  return apiRequest(`${BASE_URL}/logout.php`, {
+    method: 'POST',
+    credentials: 'include',
+  })
 }
 
 export async function verifyPassword(payload) {
-  const res = await fetch(`${BASE_URL}/verify_password.php`, {
+  // payload should now just be { password } -- the backend checks the
+  // logged-in session's own account, it no longer accepts/trusts a userid.
+  return apiRequest(`${BASE_URL}/verify_password.php`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
-  return res.json()
 }
 
 export async function fetchAuditLogs() {
-  const requesterId = getRequesterId()
-  const res = await fetch(`${BASE_URL}/list_audit.php?requester_id=${encodeURIComponent(requesterId)}`)
-  return res.json()
+  return apiRequest(`${BASE_URL}/list_audit.php`, {
+    credentials: 'include',
+  })
 }

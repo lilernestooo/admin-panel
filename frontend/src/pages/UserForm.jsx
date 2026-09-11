@@ -72,8 +72,16 @@ export default function UserForm() {
   // -- Verify-password-to-unlock-new-password-field flow ---------------
   const handleVerifyPassword = async (values) => {
     setVerifying(true)
-    const storedAdmin = JSON.parse(localStorage.getItem('admin_user') || '{}')
-    const res = await verifyPassword({ userid: storedAdmin.userid, password: values.confirm_password })
+    let res
+    try {
+      // userid is no longer needed -- the backend checks the logged-in
+      // session's own account regardless of what's sent here.
+      res = await verifyPassword({ password: values.confirm_password })
+    } catch (err) {
+      setVerifying(false)
+      message.error('Could not reach the backend. Please try again.')
+      return
+    }
     setVerifying(false)
 
     if (res.success) {
@@ -89,9 +97,16 @@ export default function UserForm() {
   // -- Submit ------------------------------------------------------------
   const handleSubmit = async (values) => {
     setSubmitting(true)
-    const res = isEditing
-      ? await updateUser({ ...values, rec_id: editingUser.rec_id })
-      : await registerUser(values)
+    let res
+    try {
+      res = isEditing
+        ? await updateUser({ ...values, rec_id: editingUser.rec_id })
+        : await registerUser(values)
+    } catch (err) {
+      setSubmitting(false)
+      message.error('Could not reach the backend. Please check your connection and try again.')
+      return
+    }
     setSubmitting(false)
 
     if (!res.success) {
@@ -127,7 +142,14 @@ export default function UserForm() {
   // -- Delete -----------------------------------------------------------
   const handleDelete = async () => {
     setDeleting(true)
-    const res = await deleteUser(editingUser.rec_id)
+    let res
+    try {
+      res = await deleteUser(editingUser.rec_id)
+    } catch (err) {
+      setDeleting(false)
+      message.error('Could not reach the backend. Please try again.')
+      return
+    }
     setDeleting(false)
     if (res.success) {
       message.success('User deleted successfully')

@@ -17,15 +17,19 @@ const handleSubmit = async (values) => {
   try {
     const res = await loginUser(values)
     if (res.success) {
-    if (res.user.user_rights !== 'admin') {
-      message.error('You do not have permission to access this page')
-      setLoading(false)
-      return
-    }
-    localStorage.setItem('admin_user', JSON.stringify(res.user))
-    startSession()
-    message.success('Welcome back')
-    navigate('/dashboard')
+      if (res.user.user_rights !== 'admin') {
+        message.error('You do not have permission to access this page')
+        setLoading(false)
+        return
+      }
+      // The backend now controls real access via a session cookie set on
+      // login. This localStorage copy is for DISPLAY only (e.g. showing
+      // "Logged in as X" in the navbar) -- it is never sent to the server
+      // as proof of identity anymore, so it's fine if it goes stale.
+      localStorage.setItem('admin_user', JSON.stringify(res.user))
+      startSession()
+      message.success('Welcome back')
+      navigate('/dashboard')
     } else {
       message.error(res.message || 'Invalid credentials')
     }

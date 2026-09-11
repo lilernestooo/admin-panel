@@ -1,12 +1,7 @@
 <?php
-require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../config/auth.php';
+require_once __DIR__ . '/../../middleware/bootstrap.php';
 
-$database = new Database();
-$pdo = $database->connect();
-
-$requesterId = $_GET['requester_id'] ?? null;
-requireAdmin($pdo, ['requester_id' => $requesterId]);
+requireAdmin($pdo);
 
 try {
     $stmt = $pdo->query("
@@ -14,15 +9,17 @@ try {
                user_dealer_group_code, user_rights, calendar_folder,
                chg_password, chg_psswrd_datetime, user_email_address,
                user_mobile_no, last_loggin, chFunction, extn_id,
-               extn_dial_prefix, tg_mobile_no, otp_code, otp_expires_at,
+               extn_dial_prefix, tg_mobile_no, otp_expires_at,
                created_at, updated_at
         FROM users
         ORDER BY rec_id DESC
+        LIMIT 500
     ");
     $users = $stmt->fetchAll();
 
     echo json_encode(["success" => true, "data" => $users]);
 } catch (PDOException $e) {
+    error_log("List users error: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(["success" => false, "message" => "Error: " . $e->getMessage()]);
+    echo json_encode(["success" => false, "message" => "Something went wrong. Please try again."]);
 }
