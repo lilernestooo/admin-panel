@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import {
-  Layout, Form, Input, Select, Button, Modal, Divider, Spin,
+  Layout, Form, Input, Select, Button, Modal, Divider, Spin, Popconfirm,
   Typography, Row, Col, message,
 } from 'antd'
-import { LockOutlined, UnlockOutlined } from '@ant-design/icons'
+import { LockOutlined, UnlockOutlined, DeleteOutlined } from '@ant-design/icons'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
-import { fetchUserById, registerUser, updateUser, verifyPassword } from '../api/userApi'
+import { fetchUserById, registerUser, updateUser, verifyPassword, deleteUser } from '../api/userApi'
 
 const { Content } = Layout
 const { Title, Text } = Typography
@@ -34,6 +34,7 @@ export default function UserForm() {
   const [notFound, setNotFound] = useState(false)
   const [editingUser, setEditingUser] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const [passwordUnlocked, setPasswordUnlocked] = useState(false)
   const [verifyModalOpen, setVerifyModalOpen] = useState(false)
@@ -121,6 +122,23 @@ export default function UserForm() {
       okButtonProps: { style: { background: '#111', borderColor: '#111' } },
       onOk: () => closeOrRedirect(navigate),
     })
+  }
+
+  // -- Delete -----------------------------------------------------------
+  const handleDelete = async () => {
+    setDeleting(true)
+    const res = await deleteUser(editingUser.rec_id)
+    setDeleting(false)
+    if (res.success) {
+      message.success('User deleted successfully')
+      // Try to close the tab; if it stays open, redirect to the users list
+      window.close()
+      setTimeout(() => {
+        if (!window.closed) navigate('/')
+      }, 150)
+    } else {
+      message.error(res.message || 'Delete failed')
+    }
   }
 
   if (loadingUser) {
@@ -332,13 +350,42 @@ export default function UserForm() {
                 </Row>
               </div>
 
-              <Form.Item style={{ marginTop: 32, marginBottom: 0, textAlign: 'right' }}>
-                <Button size="large" style={{ marginRight: 8 }} onClick={() => closeOrRedirect(navigate)}>
-                  Cancel
-                </Button>
-                <Button size="large" type="primary" htmlType="submit" loading={submitting} style={{ background: '#111', borderColor: '#111' }}>
-                  Submit
-                </Button>
+              <Form.Item style={{ marginTop: 32, marginBottom: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                  {/* Delete button — only shown when editing an existing user */}
+                  {isEditing ? (
+                    <Popconfirm
+                      title="Delete this user?"
+                      description="This action cannot be undone."
+                      onConfirm={handleDelete}
+                      okText="Yes, Delete"
+                      cancelText="Cancel"
+                      okButtonProps={{ danger: true }}
+                    >
+                      <Button
+                        size="large"
+                        danger
+                        icon={<DeleteOutlined />}
+                        loading={deleting}
+                        style={{ borderRadius: 6 }}
+                      >
+                        Delete User
+                      </Button>
+                    </Popconfirm>
+                  ) : (
+                    <span />
+                  )}
+
+                  {/* Cancel + Submit on the right */}
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Button size="large" style={{ borderRadius: 6 }} onClick={() => closeOrRedirect(navigate)}>
+                      Cancel
+                    </Button>
+                    <Button size="large" type="primary" htmlType="submit" loading={submitting} style={{ background: '#111', borderColor: '#111', borderRadius: 6 }}>
+                      {isEditing ? 'Save Changes' : 'Register User'}
+                    </Button>
+                  </div>
+                </div>
               </Form.Item>
             </Form>
           </Spin>

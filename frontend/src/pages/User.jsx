@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import {
-  Layout, Table, Button, Modal, Popconfirm, message, Statistic, Row, Col,
-  Typography, Space, Tag, Avatar, Segmented, Descriptions, Tooltip, Divider,
+  Layout, Table, Button, message, Statistic, Row, Col,
+  Typography, Space, Tag, Avatar, Segmented, Descriptions, Tooltip,
 } from 'antd'
 import {
-  UserOutlined, PlusOutlined, EditOutlined, DeleteOutlined,
-  SafetyCertificateOutlined, InfoCircleOutlined, TeamOutlined,
-  PlusCircleFilled, MinusCircleFilled, MailOutlined, PhoneOutlined,
+  UserOutlined, PlusOutlined, EditOutlined,
+  SafetyCertificateOutlined, TeamOutlined,
+  PlusCircleFilled, MinusCircleFilled,
 } from '@ant-design/icons'
 import Sidebar from '../components/Sidebar'
 import Navbar from '../components/Navbar'
 import UserSearchBar from '../components/UserSearchBar'
-import { fetchUsers, deleteUser } from '../api/userApi'
+import { fetchUsers } from '../api/userApi'
 
 const { Content } = Layout
 const { Text, Title } = Typography
@@ -20,10 +20,8 @@ export default function User() {
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [infoUser, setInfoUser] = useState(null)
   const [rightsFilter, setRightsFilter] = useState('all') // 'all' | 'admin' | 'user'
 
-  // -- Data loading ---------------------------------------------------
   const loadUsers = async () => {
     setLoading(true)
     try {
@@ -51,16 +49,7 @@ export default function User() {
     }
   }, [])
 
-  const handleDelete = async (rec_id) => {
-    const res = await deleteUser(rec_id)
-    if (res.success) {
-      message.success('User deleted')
-      if (infoUser?.rec_id === rec_id) setInfoUser(null)
-      loadUsers()
-    } else {
-      message.error(res.message || 'Delete failed')
-    }
-  }
+
 
   const filteredUsers = users.filter((u) => {
     const term = searchTerm.toLowerCase()
@@ -114,13 +103,13 @@ export default function User() {
       onHeaderCell: () => ({ className: 'actions-divider' }),
       onCell: () => ({ className: 'actions-divider' }),
       render: (_, record) => (
-        <Tooltip title="View Info">
+        <Tooltip title="Edit User">
           <Button
             type="text"
             shape="circle"
-            icon={<InfoCircleOutlined />}
+            icon={<EditOutlined />}
             className="lgc-icon-btn"
-            onClick={() => setInfoUser(record)}
+            onClick={() => window.open(`/users/edit/${record.rec_id}`, '_blank', 'noopener')}
           />
         </Tooltip>
       ),
@@ -344,156 +333,8 @@ export default function User() {
             background-color: #ff4d4f !important;
           }
 
-          /* Redesigned user info modal */
-          .lgc-info-modal .ant-modal-content {
-            padding: 0;
-            border-radius: 12px;
-            overflow: hidden;
-          }
-          .lgc-info-modal .ant-modal-close {
-            top: 16px;
-            right: 16px;
-            color: #fff;
-          }
-          .lgc-info-modal .ant-modal-close:hover {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.15);
-          }
-          .lgc-info-header {
-            background: #111;
-            padding: 32px 24px 24px;
-            text-align: center;
-            position: relative;
-          }
-          .lgc-info-header .ant-avatar {
-            border: 3px solid rgba(255, 255, 255, 0.15);
-          }
-          .lgc-info-actions {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            display: flex;
-            gap: 4px;
-          }
-          .lgc-info-actions .lgc-icon-btn {
-            color: rgba(255, 255, 255, 0.75) !important;
-          }
-          .lgc-info-actions .lgc-icon-btn:hover {
-            color: #fff !important;
-            background-color: rgba(255, 255, 255, 0.15) !important;
-          }
-          .lgc-info-actions .lgc-icon-btn.lgc-icon-danger:hover {
-            background-color: #ff4d4f !important;
-            color: #fff !important;
-          }
-          .lgc-info-body {
-            padding: 20px 24px 24px;
-          }
-          .lgc-info-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
-          }
-          .lgc-info-row:last-child {
-            border-bottom: none;
-          }
-          .lgc-info-row .anticon {
-            color: #8c8c8c;
-            font-size: 14px;
-          }
         `}</style>
       </Layout>
-
-      {/* User Info popup: redesigned header with avatar + icon-only edit/delete actions */}
-      {infoUser && (
-        <Modal
-          open={!!infoUser}
-          onCancel={() => setInfoUser(null)}
-          footer={null}
-          destroyOnClose
-          width={400}
-          closeIcon={<span style={{ fontSize: 16 }}>✕</span>}
-          className="lgc-info-modal"
-        >
-          <div className="lgc-info-header">
-            <div className="lgc-info-actions">
-              <Tooltip title="Edit">
-                <Button
-                  type="text"
-                  shape="circle"
-                  icon={<EditOutlined />}
-                  className="lgc-icon-btn"
-                  onClick={() => window.open(`/users/edit/${infoUser.rec_id}`, '_blank', 'noopener')}
-                />
-              </Tooltip>
-              <Popconfirm
-                title="Delete this user?"
-                description="This action cannot be undone."
-                onConfirm={() => handleDelete(infoUser.rec_id)}
-                okText="Delete"
-                okButtonProps={{ danger: true }}
-              >
-                <Tooltip title="Delete">
-                  <Button
-                    type="text"
-                    shape="circle"
-                    icon={<DeleteOutlined />}
-                    className="lgc-icon-btn lgc-icon-danger"
-                  />
-                </Tooltip>
-              </Popconfirm>
-            </div>
-
-            <Avatar size={72} style={{ backgroundColor: '#333' }} icon={<UserOutlined />} />
-            <Title level={5} style={{ color: '#fff', margin: '12px 0 4px' }}>
-              {infoUser.user_name}
-            </Title>
-            <Tag color={infoUser.user_rights === 'admin' ? '#fff' : 'rgba(255,255,255,0.15)'}
-                 style={{
-                   borderRadius: 999, border: 'none', margin: 0,
-                   color: infoUser.user_rights === 'admin' ? '#111' : '#fff',
-                   fontWeight: 600, fontSize: 11, padding: '2px 10px',
-                 }}>
-              {(infoUser.user_rights || 'user').toUpperCase()}
-            </Tag>
-          </div>
-
-          <div className="lgc-info-body">
-            <div className="lgc-info-row">
-              <UserOutlined />
-              <div>
-                <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>User ID</Text>
-                <Text strong>{infoUser.userid}</Text>
-              </div>
-            </div>
-            <div className="lgc-info-row">
-              <MailOutlined />
-              <div>
-                <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>Email</Text>
-                <Text>{infoUser.user_email_address || '-'}</Text>
-              </div>
-            </div>
-            <div className="lgc-info-row">
-              <PhoneOutlined />
-              <div>
-                <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>Mobile</Text>
-                <Text>{infoUser.user_mobile_no || '-'}</Text>
-              </div>
-            </div>
-
-            {infoUser.user_rights === 'admin' && (
-              <>
-                <Divider style={{ margin: '12px 0' }} />
-                <Text type="secondary" style={{ fontSize: 12, display: 'block', textAlign: 'center' }}>
-                  Expand this user's row in the table to view system access details.
-                </Text>
-              </>
-            )}
-          </div>
-        </Modal>
-      )}
     </Layout>
   )
 }
