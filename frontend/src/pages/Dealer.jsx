@@ -129,7 +129,7 @@ export default function Dealer() {
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
       <Layout>
-        <Navbar title="DEALER MAINTENANCE" />
+        <Navbar title="DEALERS MAINTENANCE" />
         <Content style={{ margin: 24 }}>
 
           {/* Stat cards */}

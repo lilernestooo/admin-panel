@@ -128,7 +128,7 @@ export default function User() {
     <Layout style={{ minHeight: '100vh' }}>
       <Sidebar />
       <Layout>
-        <Navbar title="USER REGISTRATION" />
+        <Navbar title="USER MAINTENANCE" />
         <Content style={{ margin: 24 }}>
 
           {/* Stat cards */}
