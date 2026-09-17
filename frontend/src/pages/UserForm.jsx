@@ -375,7 +375,7 @@ export default function UserForm() {
 
               <Form.Item style={{ marginTop: 32, marginBottom: 0 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
-                  {/* Delete button — only shown when editing an existing user */}
+                  {/* TODO: Delete User — commented out for now, re-enable when ready
                   {isEditing ? (
                     <Popconfirm
                       title="Delete this user?"
@@ -398,6 +398,8 @@ export default function UserForm() {
                   ) : (
                     <span />
                   )}
+                  */}
+                  <span />
 
                   {/* Cancel + Submit on the right */}
                   <div style={{ display: 'flex', gap: 8 }}>

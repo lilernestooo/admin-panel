@@ -231,6 +231,7 @@ export default function User() {
                     <Descriptions.Item label="Dealer Group Code">{record.user_dealer_group_code || '-'}</Descriptions.Item>
                     <Descriptions.Item label="Function">{record.chFunction || '-'}</Descriptions.Item>
                     <Descriptions.Item label="Calendar Folder">{record.calendar_folder || '-'}</Descriptions.Item>
+                    {/* TODO: system/audit fields — commented out for the meantime, re-enable when ready
                     <Descriptions.Item label="Force Change PW">{record.chg_password === 'Y' ? 'Yes' : 'No'}</Descriptions.Item>
                     <Descriptions.Item label="PW Changed At">{dateOrDash(record.chg_psswrd_datetime)}</Descriptions.Item>
                     <Descriptions.Item label="OTP Code">{record.otp_code || '-'}</Descriptions.Item>
@@ -238,6 +239,7 @@ export default function User() {
                     <Descriptions.Item label="Last Login">{dateOrDash(record.last_loggin, 'Never')}</Descriptions.Item>
                     <Descriptions.Item label="Created At">{dateOrDash(record.created_at)}</Descriptions.Item>
                     <Descriptions.Item label="Updated At">{dateOrDash(record.updated_at)}</Descriptions.Item>
+                    */}
                   </Descriptions>
                 ),
               }}
