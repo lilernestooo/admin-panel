@@ -1,0 +1,47 @@
+USE admin_dashboard;
+
+CREATE TABLE tbl_dealership (
+    rec_id              INT             NOT NULL AUTO_INCREMENT,
+    dealerid            VARCHAR(10)     NULL,
+    dealername          VARCHAR(50)     NULL,
+    daily_svrappt       VARCHAR(3)      NULL DEFAULT 'N',
+    dlrCalendar         CHAR(1)         NULL DEFAULT 'N',
+    ch_activated        VARCHAR(3)      NULL,
+    dealercode          VARCHAR(4)      NULL,
+    assigned_ga         VARCHAR(200)    NULL,
+    assigned_soamed     VARCHAR(100)    NULL,
+    bm_address          VARCHAR(100)    NULL,
+    brandid             VARCHAR(10)     NULL,
+    crm2_group_Lvl1     VARCHAR(8)      NULL,
+    vieworder           INT             NULL,
+    dealergroup         VARCHAR(4)      NULL,
+    host_name           VARCHAR(50)     NULL,
+    websites            VARCHAR(200)    NULL,
+    crm_address         VARCHAR(100)    NULL,
+    img_file            VARCHAR(20)     NULL,
+
+    lvsms_dealername    VARCHAR(80)     NULL,
+    vtiger_dealername   VARCHAR(50)     NULL,
+    sales_no            LONGTEXT        NULL,
+    trunk_no            LONGTEXT        NULL,
+    fax_no              LONGTEXT        NULL,
+    cs_appnt            LONGTEXT        NULL,
+    service_no          LONGTEXT        NULL,
+    crm_no              LONGTEXT        NULL,
+    active_dealer       VARCHAR(1)      NULL DEFAULT 'Y',
+    date_closed         VARCHAR(200)    NULL,
+    crm3_group_Lvl1     VARCHAR(8)      NULL,
+    dealer_street       VARCHAR(200)    NULL,
+    dealer_city         VARCHAR(200)    NULL,
+    dealer_facade       VARCHAR(200)    NULL,
+    responseTime        VARCHAR(3)      NULL DEFAULT 'N',
+    servis2code         VARCHAR(6)      NULL,
+
+    ch_tbl_name         VARCHAR(45)     NULL,
+    eric6_api           VARCHAR(2)      NULL DEFAULT 'N',
+    festtype            VARCHAR(10)     NULL DEFAULT 'CarsTruck',
+    FB_Ad_DealerID      VARCHAR(8)      NULL,
+    cc_assignment       VARCHAR(10)     NULL DEFAULT 'Carworld',
+
+    PRIMARY KEY (rec_id)
+) ENGINE=InnoDB;
