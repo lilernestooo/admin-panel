@@ -79,7 +79,7 @@ export default function Dealer() {
       align: 'left',
       render: (text, record) => (
         <Space style={{ paddingLeft: '8px' }}>
-          <Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<ShopOutlined />} />
+          <Avatar style={{ backgroundColor: '#b71c1c', color: '#fff' }} icon={<ShopOutlined />} />
           <div>
             <div style={{ fontWeight: 600, whiteSpace: 'nowrap' }}>{text}</div>
             <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>{record.dealerid}</Text>
@@ -118,11 +118,11 @@ export default function Dealer() {
   ]
 
   const cardStyle = {
-    background: '#fff', border: '1px solid #a7a7a7', padding: '24px 20px',
-    borderRadius: '8px', boxShadow: 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)',
+    background: 'var(--bg-card)', border: '1px solid var(--border-strong)', padding: '24px 20px',
+    borderRadius: '8px', boxShadow: 'inset 4px 0 0 0 var(--btn-dark-bg), 0 6px 16px rgba(0, 0, 0, 0.12)',
   }
-  const cardTitleStyle = { color: '#595959', fontWeight: 500, fontSize: '14px', textTransform: 'uppercase', letterSpacing: 0.5 }
-  const cardValueStyle = { color: '#0a0a0a', fontWeight: 700, fontSize: '28px' }
+  const cardTitleStyle = { color: 'var(--text-secondary)', fontWeight: 500, fontSize: '14px', textTransform: 'uppercase', letterSpacing: 0.5 }
+  const cardValueStyle = { color: 'var(--text-primary)', fontWeight: 700, fontSize: '28px' }
   const activeCount = dealers.filter((d) => (d.active_dealer || 'Y') === 'Y').length
 
   return (
@@ -191,14 +191,14 @@ export default function Dealer() {
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => window.open('/dealers/new', '_blank', 'noopener')}
-              style={{ background: '#111', borderColor: '#111' }}
+              style={{ background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)' }}
             >
               Add Dealer
             </Button>
           </Row>
 
           {/* Table */}
-          <div style={{ background: '#fff', border: '1px solid #f0f0f0' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
             <Table
               rowKey="rec_id"
               columns={columns}
@@ -265,15 +265,15 @@ export default function Dealer() {
         <style>{`
           .lgc-table .ant-table-thead > tr > th,
           .lgc-table .ant-table-tbody > tr > td {
-            border-right: 1px solid #d9d9d9 !important;
-            border-bottom: 1px solid #d9d9d9 !important;
+            border-right: 1px solid var(--border-color) !important;
+            border-bottom: 1px solid var(--border-color) !important;
           }
           .lgc-table .ant-table-container {
-            border-left: 1px solid #d9d9d9 !important;
-            border-top: 1px solid #d9d9d9 !important;
+            border-left: 1px solid var(--border-color) !important;
+            border-top: 1px solid var(--border-color) !important;
           }
           .lgc-table .ant-table-tbody > tr:last-child > td {
-            border-bottom: 1px solid #d9d9d9 !important;
+            border-bottom: 1px solid var(--border-color) !important;
           }
 
           .lgc-table .ant-table-thead > tr > th {
@@ -281,7 +281,7 @@ export default function Dealer() {
           }
 
           .lgc-segmented {
-            background: #f0f0f0 !important;
+            background: var(--bg-hover) !important;
             padding: 4px !important;
             border-radius: 999px !important;
           }
@@ -290,13 +290,13 @@ export default function Dealer() {
             transition: all 0.2s ease;
           }
           .lgc-segmented .ant-segmented-item-selected {
-            background: #111 !important;
-            color: #fff !important;
+            background: var(--btn-dark-bg) !important;
+            color: var(--btn-dark-text) !important;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
           }
           .lgc-segmented .ant-segmented-item-selected .lgc-seg-count {
-            background: #fff !important;
-            color: #111 !important;
+            background: var(--btn-dark-text) !important;
+            color: var(--btn-dark-bg) !important;
           }
           .lgc-seg-option {
             display: inline-flex;
@@ -309,20 +309,20 @@ export default function Dealer() {
             border-radius: 999px !important;
             margin: 0 !important;
             border: none !important;
-            background: #d9d9d9;
-            color: #595959;
+            background: var(--border-color);
+            color: var(--text-secondary);
             font-size: 11px;
             line-height: 16px;
             padding: 0 7px;
           }
 
           .lgc-expand-btn {
-            color: #111 !important;
+            color: var(--text-primary) !important;
             font-size: 18px !important;
             transition: transform 0.25s ease, color 0.2s ease;
           }
           .lgc-expand-btn:hover {
-            color: #595959 !important;
+            color: var(--text-secondary) !important;
             transform: scale(1.2);
           }
           .lgc-expand-btn.lgc-expand-open {
@@ -335,13 +335,13 @@ export default function Dealer() {
           }
 
           .lgc-icon-btn {
-            color: #595959 !important;
+            color: var(--text-secondary) !important;
             font-size: 16px !important;
             transition: color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
           }
           .lgc-icon-btn:hover {
-            color: #111 !important;
-            background-color: #f0f0f0 !important;
+            color: var(--text-primary) !important;
+            background-color: var(--bg-hover) !important;
             transform: scale(1.1);
           }
           .lgc-icon-btn.lgc-icon-danger:hover {

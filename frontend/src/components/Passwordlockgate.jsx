@@ -61,14 +61,14 @@ export default function PasswordLockGate({ resetKey, persistKey, title = 'System
     <>
       <div
         style={{
-          background: '#fafafa',
-          border: '1px dashed #d9d9d9',
+          background: 'var(--bg-page)',
+          border: '1px dashed var(--border-color)',
           borderRadius: 8,
           padding: '32px 24px',
           textAlign: 'center',
         }}
       >
-        <LockOutlined style={{ fontSize: 22, color: '#8c8c8c', marginBottom: 8 }} />
+        <LockOutlined style={{ fontSize: 22, color: 'var(--text-muted)', marginBottom: 8 }} />
         <div style={{ fontWeight: 600, marginBottom: 4 }}>{title} is locked</div>
         <Text type="secondary" style={{ display: 'block', marginBottom: 16 }}>
           {description || 'Confirm your account password to view this section.'}
@@ -76,7 +76,7 @@ export default function PasswordLockGate({ resetKey, persistKey, title = 'System
         <Button
           icon={<UnlockOutlined />}
           onClick={() => setModalOpen(true)}
-          style={{ background: '#111', borderColor: '#111', color: '#fff' }}
+          style={{ background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)', color: 'var(--btn-dark-text)' }}
         >
           Unlock
         </Button>
@@ -95,7 +95,7 @@ export default function PasswordLockGate({ resetKey, persistKey, title = 'System
         keyboard={false}
       >
         <Divider style={{ marginTop: 0, marginBottom: 20 }} />
-        <p style={{ color: '#595959', marginBottom: 16 }}>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>
           For security, enter your own account password to unlock {title.toLowerCase()}.
         </p>
         <Form form={form} layout="vertical" onFinish={handleVerify}>
@@ -107,7 +107,7 @@ export default function PasswordLockGate({ resetKey, persistKey, title = 'System
             <Input.Password placeholder="Enter your password" autoFocus />
           </Form.Item>
           <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-            <Button type="primary" htmlType="submit" loading={verifying} style={{ background: '#111', borderColor: '#111' }}>
+            <Button type="primary" htmlType="submit" loading={verifying} style={{ background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)' }}>
               Verify
             </Button>
           </Form.Item>

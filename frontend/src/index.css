@@ -1,5 +1,48 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+/* ── Theme tokens ──────────────────────────────────────────────
+   The Sidebar and Navbar are intentionally always-dark brand chrome
+   and are not affected by these variables. Everything else (page
+   backgrounds, cards, text, borders) reads from these tokens so
+   toggling [data-theme] on <html> re-themes the whole app. */
+:root {
+  --bg-page: #fafafa;
+  --bg-card: #ffffff;
+  --bg-hover: #f5f5f5;
+  --border-color: #d9d9d9;
+  --border-strong: #8c8c8c;
+  --text-primary: #0a0a0a;
+  --text-secondary: #595959;
+  --text-muted: #8c8c8c;
+  --btn-dark-bg: #111111;
+  --btn-dark-text: #ffffff;
+  --hero-bg: #0a0a0a;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --table-head-bg: #7c7878;
+  --table-head-text: #0a0a0a;
+  --select-highlight-bg: #b4adad;
+  --select-highlight-text: #0a0a0a;
+}
+
+[data-theme='dark'] {
+  --bg-page: #111111;
+  --bg-card: #1c1c1c;
+  --bg-hover: #262626;
+  --border-color: #333333;
+  --border-strong: #4d4d4d;
+  --text-primary: #f0f0f0;
+  --text-secondary: #bfbfbf;
+  --text-muted: #999999;
+  --btn-dark-bg: #f0f0f0;
+  --btn-dark-text: #0a0a0a;
+  --hero-bg: #262626;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --table-head-bg: #2a2a2a;
+  --table-head-text: #f0f0f0;
+  --select-highlight-bg: #4d4d4d;
+  --select-highlight-text: #f0f0f0;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -7,15 +50,17 @@
 body {
   margin: 0;
   font-family: 'Inter', -apple-system, sans-serif;
-  background: #fafafa;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .ant-table-thead > tr > th {
   font-weight: 600;
   letter-spacing: 0.3px;
   text-transform: uppercase;
-  background: #7c7878 !important;
-  color: #0a0a0a !important;
+  background: var(--table-head-bg) !important;
+  color: var(--table-head-text) !important;
   text-align: center !important;
 }
 
@@ -26,13 +71,13 @@ body {
 /* Always-visible divider on the fixed Actions column,
    independent of Ant's scroll-position shadow logic */
 .actions-divider {
-  border-left: 1px solid #d9d9d9 !important;
-  box-shadow: 1px 0 0 0 #ffffff !important;
+  border-left: 1px solid var(--border-color) !important;
+  box-shadow: 1px 0 0 0 var(--bg-card) !important;
 }
 
 .ant-table-thead > tr > th.actions-divider {
-  border-left: 1px solid #595959 !important;
-  box-shadow: 1px 0 0 0 #ffffff !important;
+  border-left: 1px solid var(--text-secondary) !important;
+  box-shadow: 1px 0 0 0 var(--bg-card) !important;
 }
 
 .ant-menu-dark .ant-menu-item-selected {
@@ -48,5 +93,5 @@ body {
    so Ant Design's native hover and focus states still apply normally */
 .user-search-bar .ant-input-affix-wrapper,
 .user-search-bar.ant-input-affix-wrapper {
-  border-color: #777171;
+  border-color: var(--border-strong);
 }

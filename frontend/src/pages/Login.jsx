@@ -70,7 +70,7 @@ const handleSubmit = async (values) => {
         <div
           style={{
             flex: 1,
-            background: '#fff',
+            background: 'var(--bg-page)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -104,7 +104,7 @@ const handleSubmit = async (values) => {
                   block
                   size="large"
                   loading={loading}
-                  style={{ background: '#111', borderColor: '#111' }}
+                  style={{ background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)' }}
                 >
                   Sign in
                 </Button>
@@ -115,13 +115,13 @@ const handleSubmit = async (values) => {
               style={{
                 marginTop: 32,
                 padding: '12px 16px',
-                background: '#f5f5f5',
-                border: '1px solid #e8e8e8',
+                background: 'var(--bg-hover)',
+                border: '1px solid var(--border-color)',
                 borderRadius: 8,
                 textAlign: 'center',
               }}
             >
-              <Text strong style={{ display: 'block', fontSize: 13, color: '#111' }}>
+              <Text strong style={{ display: 'block', fontSize: 13, color: 'var(--text-primary)' }}>
                 Admin Panel
               </Text>
               <Text type="secondary" style={{ fontSize: 12 }}>
