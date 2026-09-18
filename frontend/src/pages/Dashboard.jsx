@@ -152,13 +152,13 @@ const recentUsers = [...users]
       })()
 
 const getStatCardStyle = (key) => ({
-  background: '#fff',
-  border: '1px solid #8c8c8c',
+  background: 'var(--bg-card)',
+  border: '1px solid var(--border-strong)',
   padding: '24px 20px',
   borderRadius: 8,
   boxShadow: hoveredCard === key
     ? 'inset 4px 0 0 0 #b71c1c, 0 12px 24px rgba(0, 0, 0, 0.18)'
-    : 'inset 4px 0 0 0 #0a0a0a, 0 6px 16px rgba(0, 0, 0, 0.12)',
+    : 'inset 4px 0 0 0 var(--btn-dark-bg), 0 6px 16px rgba(0, 0, 0, 0.12)',
   height: '100%',
   cursor: 'pointer',
   transform: hoveredCard === key ? 'translateY(-4px)' : 'translateY(0)',
@@ -175,7 +175,7 @@ const getStatCardStyle = (key) => ({
           {/* ── Welcome banner ─────────────────────── */}
           <div
             style={{
-              background: '#0a0a0a',
+              background: 'var(--hero-bg)',
               borderRadius: 10,
               padding: '28px 32px',
               marginBottom: 24,
@@ -237,10 +237,10 @@ const getStatCardStyle = (key) => ({
                 onClick={() => navigate('/')}
               >
                 <Statistic
-                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>TOTAL USERS</span>}
+                  title={<span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: 14 }}>TOTAL USERS</span>}
                   value={totalUsers}
-                  prefix={<TeamOutlined style={{ color: '#0a0a0a', marginRight: 4 }} />}
-                  valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
+                  prefix={<TeamOutlined style={{ color: 'var(--text-primary)', marginRight: 4 }} />}
+                  valueStyle={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 28 }}
                 />
               </div>
             </Col>
@@ -252,10 +252,10 @@ const getStatCardStyle = (key) => ({
                 onClick={() => navigate('/')}
               >
                 <Statistic
-                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>ADMINS</span>}
+                  title={<span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: 14 }}>ADMINS</span>}
                   value={adminCount}
                   prefix={<SafetyCertificateOutlined style={{ color: '#b71c1c', marginRight: 4 }} />}
-                  valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
+                  valueStyle={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 28 }}
                 />
               </div>
             </Col>
@@ -267,10 +267,10 @@ const getStatCardStyle = (key) => ({
                 onClick={() => navigate('/')}
               >
                 <Statistic
-                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>REGULAR USERS</span>}
+                  title={<span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: 14 }}>REGULAR USERS</span>}
                   value={regularCount}
-                  prefix={<UserOutlined style={{ color: '#0a0a0a', marginRight: 4 }} />}
-                  valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
+                  prefix={<UserOutlined style={{ color: 'var(--text-primary)', marginRight: 4 }} />}
+                  valueStyle={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 28 }}
                 />
               </div>
             </Col>
@@ -281,11 +281,11 @@ const getStatCardStyle = (key) => ({
                 onMouseLeave={() => setHoveredCard(null)}
               >
                 <Statistic
-                  title={<span style={{ color: '#595959', fontWeight: 500, fontSize: 14 }}>EVER LOGGED IN</span>}
+                  title={<span style={{ color: 'var(--text-secondary)', fontWeight: 500, fontSize: 14 }}>EVER LOGGED IN</span>}
                   value={activePercent}
                   suffix="%"
                   prefix={<RiseOutlined style={{ color: '#389e0d', marginRight: 4 }} />}
-                  valueStyle={{ color: '#0a0a0a', fontWeight: 700, fontSize: 28 }}
+                  valueStyle={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 28 }}
                 />
               </div>
             </Col>
@@ -305,12 +305,12 @@ const getStatCardStyle = (key) => ({
                       size="small"
                       icon={<ReloadOutlined spin={loading} />}
                       onClick={() => loadUsers(false)}
-                      style={{ color: '#595959' }}
+                      style={{ color: 'var(--text-secondary)' }}
                     />
                   </AntTooltip>
                 </Space>
               }
-              style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
+              style={{ borderRadius: 8, height: '100%', border: '1px solid var(--border-strong)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
               headStyle={{ fontWeight: 600 }}
             >
                {growthData.length === 0 ? (
@@ -324,24 +324,24 @@ const getStatCardStyle = (key) => ({
                             <stop offset="95%" stopColor="#b71c1c" stopOpacity={0.02} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e8" vertical={true} horizontal={true} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={true} horizontal={true} />
                         <XAxis
                           dataKey="date"
-                          tick={{ fontSize: 12, fill: '#595959' }}
-                          axisLine={{ stroke: '#8c8c8c' }}
-                          tickLine={{ stroke: '#8c8c8c' }}
+                          tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+                          axisLine={{ stroke: 'var(--border-strong)' }}
+                          tickLine={{ stroke: 'var(--border-strong)' }}
                           padding={{ left: 10, right: 10 }}
                         />
                         <YAxis
                           allowDecimals={false}
-                          tick={{ fontSize: 12, fill: '#595959' }}
-                          axisLine={{ stroke: '#8c8c8c' }}
-                          tickLine={{ stroke: '#8c8c8c' }}
+                          tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+                          axisLine={{ stroke: 'var(--border-strong)' }}
+                          tickLine={{ stroke: 'var(--border-strong)' }}
                           width={35}
                         />
                         <Tooltip
-                          contentStyle={{ borderRadius: 8, border: '1px solid #d9d9d9', fontSize: 13, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                          labelStyle={{ fontWeight: 600, color: '#0a0a0a', marginBottom: 4 }}
+                          contentStyle={{ borderRadius: 8, border: '1px solid var(--border-color)', fontSize: 13, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                          labelStyle={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}
                           formatter={(value) => [`${value} users`, 'TOTAL']}
                         />
                         <Area
@@ -363,7 +363,7 @@ const getStatCardStyle = (key) => ({
             <Col span={8}>
               <Card
                 title="ROLE DISTRIBUTION"
-                style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
+                style={{ borderRadius: 8, height: '100%', border: '1px solid var(--border-strong)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
                 headStyle={{ fontWeight: 600 }}
               >
                 <div style={{ marginBottom: 20 }}>
@@ -371,7 +371,7 @@ const getStatCardStyle = (key) => ({
                     <Text>ADMINS</Text>
                     <Text strong>{adminCount}</Text>
                   </div>
-                  <Progress percent={adminPercent} strokeColor="#0a0a0a" showInfo={false} />
+                  <Progress percent={adminPercent} strokeColor="var(--btn-dark-bg)" showInfo={false} />
                 </div>
                 <div style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -384,7 +384,7 @@ const getStatCardStyle = (key) => ({
                 <Button
                   block
                   icon={<PlusOutlined />}
-                  style={{ background: '#111', borderColor: '#111', color: '#fff' }}
+                  style={{ background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)', color: 'var(--btn-dark-text)' }}
                   onClick={() => navigate('/')}
                 >
                   MANAGE USERS
@@ -419,7 +419,7 @@ const getStatCardStyle = (key) => ({
                         </Space>
                       </Space>
                     }
-                  style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
+                  style={{ borderRadius: 8, height: '100%', border: '1px solid var(--border-strong)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
                   headStyle={{ fontWeight: 600 }}
                 >
                   {recentUsers.length === 0 ? (
@@ -430,7 +430,7 @@ const getStatCardStyle = (key) => ({
                       renderItem={(u) => (
                         <List.Item
                           style={{ padding: '10px 8px', borderRadius: 6, cursor: 'pointer', transition: 'background-color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
                           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                           onClick={() => navigate('/')}
                         >
@@ -441,12 +441,12 @@ const getStatCardStyle = (key) => ({
                                 color={isActive(u.last_loggin) ? '#52c41a' : 'transparent'}
                                 offset={[-4, 32]}
                               >
-                                <Avatar style={{ backgroundColor: '#0a0a0a' }} icon={<UserOutlined />} />
+                                <Avatar style={{ backgroundColor: '#b71c1c', color: '#fff' }} icon={<UserOutlined />} />
                               </Badge>
                             }
                             title={<Text strong style={{ fontSize: 13 }}>{u.user_name}</Text>}
                             description={
-                              <Space size={4} style={{ fontSize: 12, color: '#8c8c8c' }}>
+                              <Space size={4} style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                                 <ClockCircleOutlined />
                                 {new Date(u.last_loggin).toLocaleString()}
                               </Space>
@@ -462,7 +462,7 @@ const getStatCardStyle = (key) => ({
             <Col span={12}>
               <Card
                 title="RECENTLY ADDED"
-                style={{ borderRadius: 8, height: '100%', border: '1px solid #8c8c8c', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
+                style={{ borderRadius: 8, height: '100%', border: '1px solid var(--border-strong)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)' }}
                 headStyle={{ fontWeight: 600 }}
               >
                 {recentlyCreated.length === 0 ? (
@@ -473,12 +473,12 @@ const getStatCardStyle = (key) => ({
                     renderItem={(u) => (
                       <List.Item
                         style={{ padding: '10px 8px', borderRadius: 6, cursor: 'pointer', transition: 'background-color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                         onClick={() => navigate('/')}
                       >
                         <List.Item.Meta
-                          avatar={<Avatar style={{ backgroundColor: '#fff', border: '1px solid #d9d9d9', color: '#0a0a0a' }} icon={<UserOutlined />} />}
+                          avatar={<Avatar style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }} icon={<UserOutlined />} />}
                           title={<Text strong style={{ fontSize: 13 }}>{u.user_name}</Text>}
                           description={
                             <Space size={4}>

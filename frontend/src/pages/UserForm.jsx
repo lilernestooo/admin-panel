@@ -119,7 +119,7 @@ export default function UserForm() {
         title: 'Password Changed Successfully',
         content: 'The password has been updated. You will now be logged out -- please log back in using the new password to confirm it works.',
         okText: 'Log Out Now',
-        okButtonProps: { style: { background: '#111', borderColor: '#111' } },
+        okButtonProps: { style: { background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)' } },
         onOk: () => {
           localStorage.removeItem('admin_user')
           navigate('/login')
@@ -134,7 +134,7 @@ export default function UserForm() {
         ? 'The changes have been saved.'
         : 'The new user has been added to the system.',
       okText: 'Close',
-      okButtonProps: { style: { background: '#111', borderColor: '#111' } },
+      okButtonProps: { style: { background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)' } },
       onOk: () => closeOrRedirect(navigate),
     })
   }
@@ -265,7 +265,7 @@ export default function UserForm() {
                             <span
                               onClick={() => { if (!passwordUnlocked) setVerifyModalOpen(true) }}
                               className={passwordUnlocked ? 'lock-icon unlocked' : 'lock-icon'}
-                              style={{ cursor: passwordUnlocked ? 'default' : 'pointer', color: passwordUnlocked ? '#52c41a' : '#0a0a0a' }}
+                              style={{ cursor: passwordUnlocked ? 'default' : 'pointer', color: passwordUnlocked ? '#52c41a' : 'var(--text-primary)' }}
                               title={passwordUnlocked ? 'Password field unlocked' : 'Click to verify your password and unlock'}
                             >
                               {passwordUnlocked ? <UnlockOutlined /> : <LockOutlined />}
@@ -406,7 +406,7 @@ export default function UserForm() {
                     <Button size="large" style={{ borderRadius: 6 }} onClick={() => closeOrRedirect(navigate)}>
                       Cancel
                     </Button>
-                    <Button size="large" type="primary" htmlType="submit" loading={submitting} style={{ background: '#111', borderColor: '#111', borderRadius: 6 }}>
+                    <Button size="large" type="primary" htmlType="submit" loading={submitting} style={{ background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)', borderRadius: 6 }}>
                       {isEditing ? 'Save Changes' : 'Register User'}
                     </Button>
                   </div>
@@ -427,7 +427,7 @@ export default function UserForm() {
           keyboard={false}
         >
           <Divider style={{ marginTop: 0, marginBottom: 20 }} />
-          <p style={{ color: '#595959', marginBottom: 16 }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>
             For security, enter your own account password to unlock the New Password field.
           </p>
           <Form form={verifyForm} layout="vertical" onFinish={handleVerifyPassword}>
@@ -435,7 +435,7 @@ export default function UserForm() {
               <Input.Password placeholder="Enter your password" autoFocus />
             </Form.Item>
             <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
-              <Button type="primary" htmlType="submit" loading={verifying} style={{ background: '#111', borderColor: '#111' }}>
+              <Button type="primary" htmlType="submit" loading={verifying} style={{ background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)' }}>
                 Verify
               </Button>
             </Form.Item>
@@ -450,19 +450,19 @@ export default function UserForm() {
             transition: background-color 0.15s ease, transform 0.15s ease;
           }
           .lock-icon:not(.unlocked):hover {
-            background-color: #f0f0f0;
+            background-color: var(--bg-hover);
             transform: scale(1.15);
           }
           .lock-icon.unlocked {
             cursor: default;
           }
           .lgc-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-            background-color: #b4adad !important;
-            color: #0a0a0a !important;
+            background-color: var(--select-highlight-bg) !important;
+            color: var(--select-highlight-text) !important;
             font-weight: 600;
           }
           .lgc-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-            background-color: #b4adad !important;
+            background-color: var(--select-highlight-bg) !important;
           }
 
           .ant-form-item-label > label {
@@ -483,8 +483,8 @@ export default function UserForm() {
           }
 
           .lgc-section {
-            background: #fff;
-            border: 1px solid #f0f0f0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 28px 32px;
           }

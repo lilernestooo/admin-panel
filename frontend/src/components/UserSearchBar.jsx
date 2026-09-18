@@ -19,16 +19,16 @@ export default function UserSearchBar({ onSearch, placeholder = 'Search by name,
       />
       <style>{`
         .user-search-bar .ant-input-search-button {
-          background-color: #0a0a0a;
-          border: 2px solid #0a0a0a;
+          background-color: var(--btn-dark-bg);
+          border: 2px solid var(--btn-dark-bg);
           border-left: none;
           border-radius: 0 6px 6px 0;
         }
         .user-search-bar .ant-input-search-button:hover,
         .user-search-bar .ant-input-search-button:focus {
           opacity: 0.85;
-          background-color: #0a0a0a;
-          border: 2px solid #0a0a0a;
+          background-color: var(--btn-dark-bg);
+          border: 2px solid var(--btn-dark-bg);
           border-left: none;
         }
 
@@ -36,7 +36,7 @@ export default function UserSearchBar({ onSearch, placeholder = 'Search by name,
         .user-search-bar .ant-input-affix-wrapper:hover,
         .user-search-bar .ant-input-affix-wrapper:focus,
         .user-search-bar .ant-input-affix-wrapper-focused {
-          border: 1px solid #8a8080;
+          border: 1px solid var(--border-strong);
           border-right: none;
           border-radius: 6px 0 0 6px;
           box-shadow: none;

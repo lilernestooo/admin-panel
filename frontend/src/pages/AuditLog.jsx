@@ -68,7 +68,7 @@ export default function AuditLog() {
             </Text>
           </div>
 
-          <div style={{ background: '#fff', border: '1px solid #8c8c8c' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-strong)' }}>
             <Table
               rowKey="log_id"
               columns={columns}

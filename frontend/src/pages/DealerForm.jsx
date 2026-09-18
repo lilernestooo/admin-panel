@@ -90,7 +90,7 @@ export default function DealerForm() {
         ? 'The changes have been saved.'
         : 'The new dealer has been added to the system.',
       okText: 'Close',
-      okButtonProps: { style: { background: '#111', borderColor: '#111' } },
+      okButtonProps: { style: { background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)' } },
       onOk: () => closeOrRedirect(navigate),
     })
   }
@@ -471,7 +471,7 @@ export default function DealerForm() {
                     <Button size="large" style={{ borderRadius: 6 }} onClick={() => closeOrRedirect(navigate)}>
                       Cancel
                     </Button>
-                    <Button size="large" type="primary" htmlType="submit" loading={submitting} style={{ background: '#111', borderColor: '#111', borderRadius: 6 }}>
+                    <Button size="large" type="primary" htmlType="submit" loading={submitting} style={{ background: 'var(--btn-dark-bg)', borderColor: 'var(--btn-dark-bg)', borderRadius: 6 }}>
                       {isEditing ? 'Save Changes' : 'Add Dealer'}
                     </Button>
                   </div>
@@ -483,12 +483,12 @@ export default function DealerForm() {
 
         <style>{`
           .lgc-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-            background-color: #b4adad !important;
-            color: #0a0a0a !important;
+            background-color: var(--select-highlight-bg) !important;
+            color: var(--select-highlight-text) !important;
             font-weight: 600;
           }
           .lgc-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-            background-color: #b4adad !important;
+            background-color: var(--select-highlight-bg) !important;
           }
 
           .ant-form-item-label > label {
@@ -509,8 +509,8 @@ export default function DealerForm() {
           }
 
           .lgc-section {
-            background: #fff;
-            border: 1px solid #f0f0f0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 28px 32px;
           }
