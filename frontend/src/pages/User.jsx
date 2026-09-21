@@ -93,7 +93,16 @@ export default function User() {
     {
       title: 'Rights', dataIndex: 'user_rights', key: 'user_rights', width: 120, align: 'center',
       render: (rights) => (
-        <Tag color={rights === 'admin' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0, margin: 0 }}>
+        <Tag
+          style={{
+            borderRadius: 0,
+            margin: 0,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--text-primary)',
+            fontWeight: 600,
+          }}
+        >
           {(rights || 'user').toUpperCase()}
         </Tag>
       ),

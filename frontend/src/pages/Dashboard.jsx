@@ -482,7 +482,18 @@ const getStatCardStyle = (key) => ({
                           title={<Text strong style={{ fontSize: 13 }}>{u.user_name}</Text>}
                           description={
                             <Space size={4}>
-                              <Tag color={u.user_rights === 'admin' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0, fontSize: 11 }}>
+                              <Tag
+                                style={{
+                                  borderRadius: 0,
+                                  fontSize: 11,
+                                  background: 'transparent',
+                                  border: 'none',
+                                  color: 'var(--text-primary)',
+                                  fontWeight: 600,
+                                  padding: '0 4px',
+                                  marginRight: 0,
+                                }}
+                              >
                                 {(u.user_rights || 'user').toUpperCase()}
                               </Tag>
                               <Text type="secondary" style={{ fontSize: 12 }}>
