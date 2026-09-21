@@ -95,3 +95,23 @@ body {
 .user-search-bar.ant-input-affix-wrapper {
   border-color: var(--border-strong);
 }
+
+/* Browsers (Chrome/Edge/Safari) paint their own background on
+   autofilled inputs, ignoring Ant Design's/our dark theme entirely.
+   This forces the autofill "background" to match our card color and
+   keeps the text/caret readable in both light and dark mode. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--bg-card) inset !important;
+  box-shadow: 0 0 0 1000px var(--bg-card) inset !important;
+  -webkit-text-fill-color: var(--text-primary) !important;
+  caret-color: var(--text-primary) !important;
+  /* Delays the browser's own transition so it doesn't flash the
+     native color before our override kicks in */
+  transition: background-color 600000s 0s, color 600000s 0s;
+}

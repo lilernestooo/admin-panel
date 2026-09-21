@@ -94,7 +94,16 @@ export default function Dealer() {
     {
       title: 'Status', dataIndex: 'active_dealer', key: 'active_dealer', width: 110, align: 'center',
       render: (status) => (
-        <Tag color={(status || 'Y') === 'Y' ? '#000000' : '#8c8c8c'} style={{ borderRadius: 0, margin: 0 }}>
+        <Tag
+          style={{
+            borderRadius: 0,
+            margin: 0,
+            background: 'transparent',
+            border: 'none',
+            color: 'var(--text-primary)',
+            fontWeight: 600,
+          }}
+        >
           {(status || 'Y') === 'Y' ? 'ACTIVE' : 'INACTIVE'}
         </Tag>
       ),
